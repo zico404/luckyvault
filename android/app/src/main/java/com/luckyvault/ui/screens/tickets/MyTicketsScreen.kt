@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,7 +27,7 @@ import com.luckyvault.ui.theme.*
 import com.luckyvault.ui.util.generateQrBitmap
 import com.luckyvault.ui.util.safeDateShort
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun MyTicketsScreen(
     onBack: () -> Unit,
@@ -82,7 +83,7 @@ fun MyTicketsScreen(
 
             if (refreshing) {
                 LaunchedEffect(true) {
-                    viewModel.loadData()
+                    viewModel.loadTickets()
                     refreshing = false
                 }
             }
