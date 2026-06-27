@@ -20,11 +20,11 @@ async function bootstrap() {
   const isDev = configService.get('NODE_ENV') !== 'production';
   const corsOrigins = configService.get('CORS_ORIGINS', '');
   app.enableCors({
-    origin: isDev
-      ? true
-      : corsOrigins
-        ? corsOrigins.split(',').map((s: string) => s.trim())
-        : [/\.luckyvault\.app$/, /\.vercel\.app$/],
+    origin: corsOrigins
+      ? corsOrigins.split(',').map((s: string) => s.trim())
+      : isDev
+        ? true
+        : true,
     credentials: true,
   });
 
