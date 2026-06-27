@@ -88,7 +88,7 @@ fun NotificationsScreen(
 
             if (pullToRefreshState.isRefreshing) {
                 LaunchedEffect(true) {
-                    viewModel.loadNotifications()
+                    viewModel.loadData()
                     pullToRefreshState.endRefresh()
                 }
             }

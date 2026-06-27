@@ -53,7 +53,7 @@ object AppModule {
     fun provideAuthInterceptor(dataStore: DataStore<Preferences>): Interceptor {
         return Interceptor { chain ->
             val token = runBlocking {
-                getTokenSync(dataStore, PrefKeys.ACCESS_TOKEN)
+                getTokenSync(dataStore, PrefsKeys.ACCESS_TOKEN)
             }
             val request = if (token.isNotEmpty()) {
                 chain.request().newBuilder()
@@ -70,7 +70,7 @@ object AppModule {
     @Singleton
     fun provideRefreshAuthenticator(dataStore: DataStore<Preferences>): Authenticator {
         return Authenticator { route, response ->
-            val refreshToken = runBlocking { getTokenSync(dataStore, PrefKeys.REFRESH_TOKEN) }
+            val refreshToken = runBlocking { getTokenSync(dataStore, PrefsKeys.REFRESH_TOKEN) }
             if (refreshToken.isEmpty()) return@Authenticator null
 
             val refreshResult = runCatching {

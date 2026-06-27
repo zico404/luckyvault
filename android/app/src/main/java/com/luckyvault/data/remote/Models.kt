@@ -114,6 +114,7 @@ data class DrawsResponse(
 
 data class WinnerDto(
     @SerializedName("ticketId") val ticketId: String,
+    @SerializedName("ticketCode") val ticketCode: String = "",
     @SerializedName("userId") val userId: String,
     @SerializedName("prize") val prize: Double,
     @SerializedName("rank") val rank: Int
