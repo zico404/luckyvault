@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -13,31 +12,14 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
 
   app.setGlobalPrefix('api/v1');
 
-  const corsOrigins = configService.get('CORS_ORIGINS', '');
-  const allowList = corsOrigins
-    ? corsOrigins.split(',').map((s: string) => s.trim()).filter(Boolean)
-    : [];
-
-  logger.log(`CORS configured: ${allowList.length ? allowList.join(', ') : 'allow all origins'}`);
-
   app.use((req: any, res: any, next: any) => {
-    const origin = req.headers.origin || req.headers.Origin || '';
-    const allowed = !allowList.length || allowList.includes(origin);
-
-    if (origin && allowed) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Vary', 'Origin');
-    } else if (!allowList.length) {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-    }
-
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,X-Requested-With');
+    res.setHeader('Access-Control-Allow-Headers', '*');
 
     if (req.method === 'OPTIONS') {
       res.status(204).end();
@@ -56,7 +38,7 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
-  const port = configService.get('PORT', 3000);
+  const port = process.env.PORT || 3000;
   await app.listen(port);
   logger.log(`Lucky Vault API running on port ${port}`);
 }
