@@ -4,7 +4,6 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard, Roles } from '../common/guards/roles.guard';
 import { UserRole } from '@prisma/client';
 import { successResponse } from '../common/response.util';
-import { Request } from 'express';
 
 @Controller('draws')
 export class DrawsController {
@@ -34,6 +33,7 @@ export class DrawsController {
   async createDraw(@Body() body: { title: string; description?: string; ticketPrice: number; maxTickets: number; winnerCount?: number; scheduledAt: string }) {
     const draw = await this.drawsService.createDraw({
       ...body,
+      winnerCount: body.winnerCount ?? 1,
       scheduledAt: new Date(body.scheduledAt),
     });
     return successResponse(draw, 'Draw created');

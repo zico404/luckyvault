@@ -59,7 +59,11 @@ export class AdminController {
 
   @Patch('draws/:id')
   async updateDraw(@Param('id') id: string, @Body() dto: UpdateDrawDto) {
-    const draw = await this.drawsService.updateDraw(id, dto);
+    const updateData: any = { ...dto };
+    if (dto.scheduledAt) {
+      updateData.scheduledAt = new Date(dto.scheduledAt);
+    }
+    const draw = await this.drawsService.updateDraw(id, updateData);
     return successResponse(draw, 'Draw updated');
   }
 

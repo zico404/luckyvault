@@ -83,8 +83,8 @@ export class AuthService {
     await this.prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
   }
 
-  private async generateTokens(userId: string, email: string, role: string) {
-    const payload = { sub: userId, email, role };
+  private async generateTokens(userId: string, email: string | null, role: string) {
+    const payload = { sub: userId, email: email ?? '', role };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: '15m' }),
