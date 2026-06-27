@@ -11,10 +11,13 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   const isDev = configService.get('NODE_ENV') !== 'production';
+  const corsOrigins = configService.get('CORS_ORIGINS', '');
   app.enableCors({
     origin: isDev
       ? true
-      : ['https://luckyvault.app', /\.luckyvault\.app$/],
+      : corsOrigins
+        ? corsOrigins.split(',').map((s: string) => s.trim())
+        : [/\.luckyvault\.app$/],
     credentials: true,
   });
 
