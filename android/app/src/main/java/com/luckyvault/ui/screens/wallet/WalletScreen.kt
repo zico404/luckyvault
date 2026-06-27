@@ -8,15 +8,13 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +35,7 @@ private val topUpOptions = listOf(
     TopUpOption("$100", 100.0),
 )
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WalletScreen(
     onBack: () -> Unit,
@@ -45,9 +43,6 @@ fun WalletScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showTopUp by remember { mutableStateOf(false) }
-    var refreshing by remember { mutableStateOf(false) }
-    val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
-
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Wallet", onBack = onBack) },
         containerColor = MaterialTheme.colorScheme.background
@@ -56,7 +51,6 @@ fun WalletScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             if (uiState.isLoading && uiState.transactions.isEmpty()) {
                 LazyColumn(
@@ -148,13 +142,6 @@ fun WalletScreen(
                             }
                         }
                     }
-                }
-            }
-
-            if (refreshing) {
-                LaunchedEffect(true) {
-                    viewModel.loadData()
-                    refreshing = false
                 }
             }
         }

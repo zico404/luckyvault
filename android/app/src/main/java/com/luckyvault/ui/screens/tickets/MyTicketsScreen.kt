@@ -8,14 +8,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,7 +25,7 @@ import com.luckyvault.ui.theme.*
 import com.luckyvault.ui.util.generateQrBitmap
 import com.luckyvault.ui.util.safeDateShort
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTicketsScreen(
     onBack: () -> Unit,
@@ -35,9 +33,6 @@ fun MyTicketsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTicket by remember { mutableStateOf<TicketDto?>(null) }
-    var refreshing by remember { mutableStateOf(false) }
-    val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
-
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "My Tickets", onBack = onBack) },
         containerColor = MaterialTheme.colorScheme.background
@@ -46,7 +41,6 @@ fun MyTicketsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             if (uiState.isLoading && uiState.tickets.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -78,13 +72,6 @@ fun MyTicketsScreen(
                             viewModel.loadMore()
                         }
                     }
-                }
-            }
-
-            if (refreshing) {
-                LaunchedEffect(true) {
-                    viewModel.loadTickets()
-                    refreshing = false
                 }
             }
         }
