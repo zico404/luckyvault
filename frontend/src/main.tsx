@@ -7,6 +7,15 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import App from './App'
 import './index.css'
 
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = event.reason
+  if (reason?.statusCode === 401 || reason?.message?.includes('401') || reason?.message?.includes('Unauthorized')) {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    window.location.href = '/auth'
+  }
+})
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>

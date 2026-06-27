@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.LuckyVault.Splash" parent="Theme.LuckyVault">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowSplashScreenBackground">#FF09090B</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
-        <item name="android:windowSplashScreenAnimationDuration">800</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+        <item name="android:windowSplashScreenAnimationDuration">1</item>
         <item name="android:windowSplashScreenIconBackgroundColor">#FF09090B</item>
     </style>
 </resources>

@@ -9,6 +9,7 @@ export function ProfilePage() {
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
   const [wallet, setWallet] = useState<WalletType | null>(null)
+  const [loading, setLoading] = useState(true)
   const [showLogout, setShowLogout] = useState(false)
 
   useEffect(() => {
@@ -18,12 +19,30 @@ export function ProfilePage() {
     ]).then(([profRes, balRes]) => {
       setUser(profRes.data)
       setWallet(balRes.data)
-    }).catch(() => {})
+    }).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   const handleLogout = async () => {
     await logout()
     navigate('/auth')
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-fade-in max-w-[480px] mx-auto">
+        <div className="shimmer h-8 w-32" />
+        <div className="flex flex-col items-center">
+          <div className="shimmer w-20 h-20 rounded-full" />
+          <div className="shimmer h-5 w-32 mt-4 rounded" />
+          <div className="shimmer h-4 w-48 mt-2 rounded" />
+        </div>
+        <div className="vault-card p-5 space-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="shimmer h-10 w-full" />
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (

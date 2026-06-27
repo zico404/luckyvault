@@ -25,7 +25,7 @@ const mobileNavItems = [
   { path: '/draws', icon: Ticket, label: 'Draws' },
   { path: '/tickets', icon: Ticket, label: 'Tickets' },
   { path: '/wallet', icon: Wallet, label: 'Wallet' },
-  { path: '/notifications', icon: Bell, label: 'Alerts' },
+  { path: '/profile', icon: User, label: 'Profile' },
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {

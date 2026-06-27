@@ -134,8 +134,10 @@ export function AdminPage() {
         {activeTab === 'topups' && (
           <div className="space-y-3">
             {loading ? (
-              <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-                Loading...
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="vault-card p-5"><div className="shimmer h-16 w-full" /></div>
+                ))}
               </div>
             ) : pendingTopUps.length === 0 ? (
               <div className="vault-card p-12 text-center">

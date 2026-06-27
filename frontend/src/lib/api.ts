@@ -79,14 +79,24 @@ class ApiClient {
       headers,
     })
 
-    if (response.status === 401 && this.refreshToken) {
-      const refreshed = await this.attemptRefresh()
-      if (refreshed) {
-        headers['Authorization'] = `Bearer ${this.token}`
-        response = await fetch(`${API_BASE}${endpoint}`, {
-          ...options,
-          headers,
-        })
+    if (response.status === 401) {
+      if (this.refreshToken) {
+        const refreshed = await this.attemptRefresh()
+        if (refreshed) {
+          headers['Authorization'] = `Bearer ${this.token}`
+          response = await fetch(`${API_BASE}${endpoint}`, {
+            ...options,
+            headers,
+          })
+        } else {
+          this.clearTokens()
+          window.location.href = '/auth'
+          throw new Error('Session expired')
+        }
+      } else {
+        this.clearTokens()
+        window.location.href = '/auth'
+        throw new Error('Session expired')
       }
     }
 

@@ -97,6 +97,7 @@ export interface Winner {
   ticketId: string
   userId: string
   prize: number
+  prizeAmount: number
   rank: number
 }
 

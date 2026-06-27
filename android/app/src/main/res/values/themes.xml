@@ -3,10 +3,10 @@
     <style name="Theme.LuckyVault" parent="android:Theme.Material.NoActionBar">
         <item name="android:statusBarColor">#FF09090B</item>
         <item name="android:navigationBarColor">#FF09090B</item>
-        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 
     <style name="Theme.LuckyVault.Splash" parent="Theme.LuckyVault">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 </resources>

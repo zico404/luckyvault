@@ -19,7 +19,7 @@ export function WalletPage() {
       api.getBalance(),
       api.getTransactions(),
     ]).then(([balRes, txRes]) => {
-      setBalance(balRes.data.balance || 0)
+      setBalance(Number(balRes.data.balance) || 0)
       setTransactions(txRes.data.transactions || [])
       setLoading(false)
     }).catch(() => setLoading(false))

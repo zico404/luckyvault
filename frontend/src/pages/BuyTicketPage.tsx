@@ -20,7 +20,7 @@ export function BuyTicketPage() {
         api.getBalance(),
       ]).then(([drawRes, balRes]) => {
         setDraw(drawRes.data)
-        setBalance(balRes.data.balance || 0)
+        setBalance(Number(balRes.data.balance) || 0)
         setLoading(false)
       }).catch(() => setLoading(false))
     }

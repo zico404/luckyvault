@@ -32,6 +32,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const isAuthError = this.state.error?.message?.includes('401') ||
+        this.state.error?.message?.includes('Unauthorized') ||
+        this.state.error?.message?.includes('Token') ||
+        this.state.error?.message?.includes('token')
+
       return (
         <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--vault-black)' }}>
           <div className="max-w-md w-full text-center space-y-4 animate-fade-in">
@@ -45,14 +50,31 @@ export class ErrorBoundary extends React.Component<Props, State> {
             </div>
             <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Something went wrong</h2>
             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              An unexpected error occurred. Please try again.
+              {isAuthError
+                ? 'Your session has expired. Please sign in again.'
+                : 'An unexpected error occurred. Please try again.'}
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="btn-primary"
-            >
-              Reload page
-            </button>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false, error: null })
+                  window.location.reload()
+                }}
+                className="btn-secondary"
+              >
+                Reload page
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('accessToken')
+                  localStorage.removeItem('refreshToken')
+                  window.location.href = '/auth'
+                }}
+                className="btn-primary"
+              >
+                {isAuthError ? 'Sign in' : 'Go to login'}
+              </button>
+            </div>
           </div>
         </div>
       )
