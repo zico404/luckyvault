@@ -189,14 +189,12 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        shell: bash
         run: |
           if [ -n "$KEYSTORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ]; then
-            cat > keystore.properties << EOF
-            storeFile=keystore.jks
-            storePassword=$KEYSTORE_PASSWORD
-            keyAlias=$KEY_ALIAS
-            keyPassword=$KEY_PASSWORD
-            EOF
+            printf 'storeFile=keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+              "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > keystore.properties
+            echo "keystore.properties created"
           else
             echo "Warning: Keystore secrets not fully configured. Skipping keystore.properties creation."
           fi

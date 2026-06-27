@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,7 +44,8 @@ fun WalletScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showTopUp by remember { mutableStateOf(false) }
-    val pullToRefreshState = rememberPullToRefreshState()
+    var refreshing by remember { mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
 
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Wallet", onBack = onBack) },
@@ -53,7 +55,7 @@ fun WalletScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             if (uiState.isLoading && uiState.transactions.isEmpty()) {
                 LazyColumn(
@@ -148,10 +150,10 @@ fun WalletScreen(
                 }
             }
 
-            if (pullToRefreshState.isRefreshing) {
+            if (refreshing) {
                 LaunchedEffect(true) {
                     viewModel.loadData()
-                    pullToRefreshState.endRefresh()
+                    refreshing = false
                 }
             }
         }

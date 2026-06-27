@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,7 +34,8 @@ fun MyTicketsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTicket by remember { mutableStateOf<TicketDto?>(null) }
-    val pullToRefreshState = rememberPullToRefreshState()
+    var refreshing by remember { mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
 
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "My Tickets", onBack = onBack) },
@@ -43,7 +45,7 @@ fun MyTicketsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             if (uiState.isLoading && uiState.tickets.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -78,11 +80,12 @@ fun MyTicketsScreen(
                 }
             }
 
-            if (pullToRefreshState.isRefreshing) {
+            if (refreshing) {
                 LaunchedEffect(true) {
-                    viewModel.loadTickets()
-                    pullToRefreshState.endRefresh()
+                    viewModel.loadData()
+                    refreshing = false
                 }
+            }
             }
         }
     }

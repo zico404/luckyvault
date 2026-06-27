@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,7 +39,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val pullToRefreshState = rememberPullToRefreshState()
+    var refreshing by remember { mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(refreshing, { refreshing = true })
 
     Scaffold(
         topBar = {
@@ -60,7 +62,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
+                .nestedScroll(pullRefreshState.nestedScrollConnection)
         ) {
             if (uiState.isLoading) {
                 LazyColumn(
@@ -155,10 +157,10 @@ fun HomeScreen(
                 }
             }
 
-            if (pullToRefreshState.isRefreshing) {
+            if (refreshing) {
                 LaunchedEffect(true) {
                     viewModel.loadData()
-                    pullToRefreshState.endRefresh()
+                    refreshing = false
                 }
             }
         }
