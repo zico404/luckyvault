@@ -51,7 +51,11 @@ export class DrawsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async updateDraw(@Param('id') id: string, @Body() body: any) {
-    const draw = await this.drawsService.updateDraw(id, body);
+    const updateData: any = { ...body };
+    if (body.scheduledAt) {
+      updateData.scheduledAt = new Date(body.scheduledAt);
+    }
+    const draw = await this.drawsService.updateDraw(id, updateData);
     return successResponse(draw, 'Draw updated');
   }
 
