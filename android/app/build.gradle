@@ -45,7 +45,9 @@ android {
             buildConfigField "Boolean", "IS_DEBUG", "true"
         }
         release {
-            signingConfig signingConfigs.release
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
             buildConfigField "String", "API_BASE_URL", '"https://api.luckyvault.app/api/v1/"'
             buildConfigField "Boolean", "IS_DEBUG", "false"
             minifyEnabled true
