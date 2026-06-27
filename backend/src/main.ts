@@ -25,13 +25,16 @@ async function bootstrap() {
   logger.log(`CORS configured: ${allowList.length ? allowList.join(', ') : 'allow all origins'}`);
 
   app.use((req: any, res: any, next: any) => {
-    const origin = req.headers.origin;
-    if (origin) {
-      const allowed = allowList.length === 0 || allowList.includes(origin);
-      if (allowed) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-      }
+    const origin = req.headers.origin || req.headers.Origin || '';
+    const allowed = !allowList.length || allowList.includes(origin);
+
+    if (origin && allowed) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    } else if (!allowList.length) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
     }
+
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,X-Requested-With');
