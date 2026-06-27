@@ -38,9 +38,11 @@ CREATE POLICY "Users can view own wallet" ON "Wallet"
 CREATE POLICY "Users cannot modify wallet directly" ON "Wallet"
     FOR ALL USING (false);
 
--- Transaction policies
+-- Transaction policies (Transaction has walletId, not userId — join through Wallet)
 CREATE POLICY "Users can view own transactions" ON "Transaction"
-    FOR SELECT USING (auth.uid() = "userId");
+    FOR SELECT USING (
+        EXISTS (SELECT 1 FROM "Wallet" WHERE id = "walletId" AND "userId" = auth.uid())
+    );
 
 CREATE POLICY "Users cannot create transactions directly" ON "Transaction"
     FOR INSERT WITH CHECK (false);
