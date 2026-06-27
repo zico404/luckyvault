@@ -1,6 +1,7 @@
 package com.luckyvault.ui.screens.wallet
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +25,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.luckyvault.ui.components.LuckyVaultTopBar
 import com.luckyvault.ui.theme.*
 
+private val QUICK_AMOUNTS = listOf(10.0, 25.0, 50.0, 100.0)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WalletScreen(
@@ -32,9 +35,31 @@ fun WalletScreen(
     viewModel: WalletViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var mockLoading by remember { mutableStateOf<Double?>(null) }
+
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let {
+            mockLoading = null
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearSnackbar()
+        }
+    }
 
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Wallet", onBack = onBack) },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = VaultElevated,
+                    contentColor = TextPrimary,
+                    actionColor = Champagne,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        },
         containerColor = VaultBlack
     ) { padding ->
         LazyColumn(
@@ -84,6 +109,53 @@ fun WalletScreen(
                                     Icon(Icons.Default.Add, null, modifier = Modifier.size(16.dp))
                                     Spacer(Modifier.width(8.dp))
                                     Text("Top up", fontWeight = FontWeight.Medium, fontSize = 13.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Quick top-up
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    color = VaultGraphite
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Quick top-up (pending approval)", fontSize = 11.sp, color = TextMuted, letterSpacing = 0.5.sp)
+                        Spacer(Modifier.height(10.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            QUICK_AMOUNTS.forEach { amt ->
+                                val isLoading = mockLoading == amt
+                                Surface(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(40.dp)
+                                        .clickable(enabled = mockLoading == null) {
+                                            mockLoading = amt
+                                            viewModel.topUp(amt)
+                                        },
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = if (isLoading) Champagne else VaultCharcoal
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        if (isLoading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(16.dp),
+                                                color = VaultBlack,
+                                                strokeWidth = 2.dp
+                                            )
+                                        } else {
+                                            Text(
+                                                "$${amt.toInt()}",
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 13.sp,
+                                                color = TextSecondary
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }

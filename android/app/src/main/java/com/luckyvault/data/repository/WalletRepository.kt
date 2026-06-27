@@ -35,4 +35,18 @@ class WalletRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun topUp(amount: Double, paymentMethod: String = "mock"): Result<TopUpResponse> {
+        return try {
+            val response = api.topUp(TopUpRequest(amount, paymentMethod))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Top-up failed"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

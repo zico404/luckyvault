@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, Transaction } from '@/lib/api'
+import { useToast } from '@/components/Toast'
 import { Wallet, ArrowUpRight, ArrowDownLeft, Plus, Minus, ArrowRight } from 'lucide-react'
+
+const MOCK_AMOUNTS = [10, 25, 50, 100]
 
 export function WalletPage() {
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [balance, setBalance] = useState(0)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [mockLoading, setMockLoading] = useState<number | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -19,6 +24,18 @@ export function WalletPage() {
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
+
+  const handleMockTopUp = async (amount: number) => {
+    setMockLoading(amount)
+    try {
+      await api.topUp(amount, 'mock')
+      toast(`$${amount} top-up request submitted — pending admin approval`, 'success')
+    } catch (e: any) {
+      toast(e?.message || 'Top-up failed', 'error')
+    } finally {
+      setMockLoading(null)
+    }
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -43,6 +60,28 @@ export function WalletPage() {
         >
           <Plus className="w-4 h-4" /> Top up
         </button>
+      </div>
+
+      {/* Mock top-up (instant request) */}
+      <div className="vault-card p-5">
+        <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>Quick top-up (pending approval)</p>
+        <div className="flex gap-2">
+          {MOCK_AMOUNTS.map((amt) => (
+            <button
+              key={amt}
+              onClick={() => handleMockTopUp(amt)}
+              disabled={mockLoading !== null}
+              className="flex-1 py-2.5 rounded-lg text-sm font-medium transition-all"
+              style={{
+                background: mockLoading === amt ? 'var(--champagne)' : 'var(--vault-charcoal)',
+                color: mockLoading === amt ? 'var(--vault-black)' : 'var(--text-secondary)',
+                opacity: mockLoading !== null && mockLoading !== amt ? 0.5 : 1,
+              }}
+            >
+              {mockLoading === amt ? '...' : `$${amt}`}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Transactions */}

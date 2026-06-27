@@ -2,7 +2,6 @@ package com.luckyvault.ui.screens.auth
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -37,8 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.luckyvault.ui.components.VaultMark
 import com.luckyvault.ui.theme.*
-import android.content.Intent
-import android.net.Uri
 
 @Composable
 fun AuthScreen(
@@ -247,50 +244,6 @@ fun AuthScreen(
                 )
 
                 Spacer(Modifier.height(24.dp))
-
-                // Get it on Google Play
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .clickable {
-                            try {
-                                val intent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("market://details?id=com.luckyvault")
-                                )
-                                context.startActivity(intent)
-                            } catch (_: Exception) {
-                                val intent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://play.google.com/store/apps/details?id=com.luckyvault")
-                                )
-                                context.startActivity(intent)
-                            }
-                        },
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFF000000),
-                    border = BorderStroke(1.dp, Brush.linearGradient(listOf(Color(0xFF5F6368), Color(0xFF5F6368))))
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "GET IT ON",
-                            fontSize = 10.sp,
-                            color = Color(0xFFAAAAAA),
-                            modifier = Modifier.padding(end = 6.dp)
-                        )
-                        Text(
-                            text = "Google Play",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
-                        )
-                    }
-                }
 
                 Spacer(Modifier.weight(0.5f))
             }

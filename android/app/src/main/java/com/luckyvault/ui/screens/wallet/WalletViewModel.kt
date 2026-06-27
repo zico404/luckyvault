@@ -18,7 +18,8 @@ data class WalletUiState(
     val transactions: List<TransactionDto> = emptyList(),
     val page: Int = 1,
     val totalPages: Int = 1,
-    val error: String? = null
+    val error: String? = null,
+    val snackbarMessage: String? = null
 )
 
 @HiltViewModel
@@ -54,12 +55,25 @@ class WalletViewModel @Inject constructor(
 
     fun topUp(amount: Double) {
         viewModelScope.launch {
-            val currentBalance = _uiState.value.wallet?.balance ?: 0.0
-            _uiState.value = _uiState.value.copy(
-                wallet = WalletDto(balance = currentBalance + amount, currency = "USD")
+            val result = walletRepository.topUp(amount)
+            result.fold(
+                onSuccess = {
+                    loadData()
+                    _uiState.value = _uiState.value.copy(
+                        snackbarMessage = "$${String.format("%.2f", amount)} top-up submitted — pending admin approval"
+                    )
+                },
+                onFailure = { e ->
+                    _uiState.value = _uiState.value.copy(
+                        snackbarMessage = e.message ?: "Top-up failed"
+                    )
+                }
             )
-            // In a real app, this would call a deposit API endpoint
         }
+    }
+
+    fun clearSnackbar() {
+        _uiState.value = _uiState.value.copy(snackbarMessage = null)
     }
 
     fun loadMore() {
