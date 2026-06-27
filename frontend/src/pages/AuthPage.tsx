@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/Toast'
-import { Mail, Lock, User, Eye, EyeOff, Smartphone } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import { VaultMark } from '@/components/VaultLogo'
+
+const API_BASE = import.meta.env.VITE_API_URL || 'https://lucky-vault-backend-production.up.railway.app'
 
 export function AuthPage() {
   const navigate = useNavigate()
@@ -15,6 +17,14 @@ export function AuthPage() {
   const [displayName, setDisplayName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [appVersion, setAppVersion] = useState('')
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/v1/download/version`)
+      .then(r => r.json())
+      .then(data => setAppVersion(data.version || ''))
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -176,7 +186,7 @@ export function AuthPage() {
             </svg>
             <div className="flex flex-col items-start leading-tight">
               <span className="text-[10px] font-normal" style={{ color: '#aaa' }}>GET IT ON</span>
-              <span className="text-sm font-semibold" style={{ color: '#fff' }}>Google Play</span>
+              <span className="text-sm font-semibold" style={{ color: '#fff' }}>Google Play {appVersion && <span className="text-[10px] font-normal opacity-60">v{appVersion}</span>}</span>
             </div>
           </a>
         </div>

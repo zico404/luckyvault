@@ -167,6 +167,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Download debug APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lucky-vault-debug-apk
+          path: apks/
+        continue-on-error: true
+
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
@@ -289,15 +296,24 @@ jobs:
         run: |
           cd "${{ github.workspace }}"
           VERSION=$(grep 'versionName' android/app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
-          APK_FILE="apks/LuckyVault-v${VERSION}.apk"
-          if [ -f "$APK_FILE" ]; then
-            cp "$APK_FILE" apks/LuckyVault.apk
+          RELEASE_APK="apks/LuckyVault-v${VERSION}.apk"
+          DEBUG_APK="apks/LuckyVault-v${VERSION}-debug.apk"
+          ASSETS=""
+          if [ -f "$RELEASE_APK" ]; then
+            cp "$RELEASE_APK" apks/LuckyVault.apk
+            ASSETS="apks/LuckyVault.apk"
+          fi
+          if [ -f "$DEBUG_APK" ]; then
+            cp "$DEBUG_APK" apks/LuckyVault-debug.apk
+            ASSETS="$ASSETS apks/LuckyVault-debug.apk"
+          fi
+          if [ -n "$ASSETS" ]; then
             gh release delete "v${VERSION}" --yes --cleanup-tag 2>/dev/null || true
-            gh release create "v${VERSION}" apks/LuckyVault.apk \
+            gh release create "v${VERSION}" $ASSETS \
               --title "Lucky Vault v${VERSION}" \
               --notes "Lucky Vault Android APK v${VERSION}" \
               --latest
-            echo "Release v${VERSION} created with stable download URL"
+            echo "Release v${VERSION} created with APKs"
           fi
 
   summary:

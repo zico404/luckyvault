@@ -98,12 +98,12 @@ class ApiClient {
           })
         } else {
           this.clearTokens()
-          window.location.href = '/auth'
+          window.dispatchEvent(new Event('auth:logout'))
           throw new Error('Session expired')
         }
       } else {
         this.clearTokens()
-        window.location.href = '/auth'
+        window.dispatchEvent(new Event('auth:logout'))
         throw new Error('Session expired')
       }
     }

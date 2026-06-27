@@ -28,6 +28,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       setIsLoading(false)
     }
+
+    const handleLogout = () => setUser(null)
+    window.addEventListener('auth:logout', handleLogout)
+    return () => window.removeEventListener('auth:logout', handleLogout)
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
