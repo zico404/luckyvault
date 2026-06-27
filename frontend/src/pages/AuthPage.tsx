@@ -20,13 +20,16 @@ export function AuthPage() {
     setError('')
     setLoading(true)
     try {
-      const success = isLogin
+      const result = isLogin
         ? await login(email, password)
         : await register(email, password, displayName || undefined)
-      if (success) navigate('/')
-      else setError('Authentication failed. Please check your credentials.')
-    } catch {
-      setError('An error occurred. Please try again.')
+      if (result.success) {
+        navigate('/')
+      } else {
+        setError(result.error || 'Authentication failed. Please check your credentials.')
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }

@@ -6,8 +6,8 @@ interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<boolean>
-  register: (email: string, password: string, displayName?: string) => Promise<boolean>
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  register: (email: string, password: string, displayName?: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
 }
 
@@ -30,22 +30,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
-    const res = await api.login(email, password)
-    if (res.success) {
-      setUser(res.data.user)
-      return true
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const res = await api.login(email, password)
+      if (res.success) {
+        setUser(res.data.user)
+        return { success: true }
+      }
+      return { success: false, error: res.error || 'Invalid credentials' }
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Login failed. Please try again.' }
     }
-    return false
   }, [])
 
-  const register = useCallback(async (email: string, password: string, displayName?: string): Promise<boolean> => {
-    const res = await api.register(email, password, displayName)
-    if (res.success) {
-      setUser(res.data.user)
-      return true
+  const register = useCallback(async (email: string, password: string, displayName?: string) => {
+    try {
+      const res = await api.register(email, password, displayName)
+      if (res.success) {
+        setUser(res.data.user)
+        return { success: true }
+      }
+      return { success: false, error: res.error || 'Registration failed' }
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Registration failed. Please try again.' }
     }
-    return false
   }, [])
 
   const logout = useCallback(async () => {
