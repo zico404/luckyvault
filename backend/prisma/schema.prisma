@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum TicketStatus {
+  ACTIVE
+  WON
+  LOST
+  REFUNDED
+}
+
+enum TransactionType {
+  DEPOSIT
+  PURCHASE
+  WINNING
+  REFUND
+  WITHDRAWAL
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum DrawStatus {
+  UPCOMING
+  OPEN
+  LOCKED
+  DRAWING
+  COMPLETED
+  CANCELLED
+}
+
+enum AuditAction {
+  USER_LOGIN
+  USER_REGISTER
+  TICKET_PURCHASE
+  DRAW_CREATE
+  DRAW_LOCK
+  DRAW_EXECUTE
+  DRAW_COMPLETE
+  WALLET_CREDIT
+  WALLET_DEBIT
+  ADMIN_ACTION
+  SYSTEM_EVENT
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String?   @unique
+  phone         String?   @unique
+  passwordHash  String
+  displayName   String?
+  avatarUrl     String?
+  role          UserRole  @default(USER)
+  isVerified    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  wallet        Wallet?
+  tickets       Ticket[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Decimal  @default(0) @db.Decimal(18, 2)
+  currency  String   @default("USD")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id          String            @id @default(uuid())
+  walletId    String
+  type        TransactionType
+  amount      Decimal           @db.Decimal(18, 2)
+  balanceAfter Decimal          @db.Decimal(18, 2)
+  status      TransactionStatus @default(COMPLETED)
+  referenceId String?
+  description String?
+  metadata    Json?
+  createdAt   DateTime          @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Ticket {
+  id          String       @id
+  userId      String
+  drawId      String
+  ticketCode  String       @unique
+  status      TicketStatus @default(ACTIVE)
+  qrCodeUrl   String?
+  purchasePrice Decimal    @db.Decimal(18, 2)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  draw Draw @relation(fields: [drawId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([drawId])
+  @@index([status])
+  @@index([ticketCode])
+}
+
+model Draw {
+  id            String     @id @default(uuid())
+  title         String
+  description   String?
+  ticketPrice   Decimal    @db.Decimal(18, 2)
+  maxTickets    Int
+  soldTickets   Int        @default(0)
+  prizePool     Decimal    @default(0) @db.Decimal(18, 2)
+  winnerCount   Int        @default(1)
+  status        DrawStatus @default(UPCOMING)
+  scheduledAt   DateTime
+  startedAt     DateTime?
+  completedAt   DateTime?
+  resultHash    String?
+  resultSalt    String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  tickets  Ticket[]
+  winners  Winner[]
+
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model Winner {
+  id          String   @id @default(uuid())
+  drawId      String
+  ticketId    String   @unique
+  userId      String
+  prizeAmount Decimal  @db.Decimal(18, 2)
+  rank        Int      @default(1)
+  isPaid      Boolean  @default(false)
+  paidAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  draw   Draw   @relation(fields: [drawId], references: [id], onDelete: Cascade)
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([drawId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  userId     String?
+  action     AuditAction
+  entity     String
+  entityId   String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  body      String
+  type      String
+  data      Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}

@@ -1,0 +1,40 @@
+node_modules/
+dist/
+build/
+.env
+*.log
+
+# Android
+android/.gradle/
+android/app/build/
+android/app/release/
+android/captures/
+android/.externalNativeBuild/
+*.iml
+local.properties
+*.keystore
+!android/app/proguard-rules.pro
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Backend
+backend/dist/
+backend/node_modules/
+
+# Gradle
+.gradle/
+build/
