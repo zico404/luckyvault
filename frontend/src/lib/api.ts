@@ -11,7 +11,28 @@ import type {
   UnreadCountResponse,
   Wallet,
   User,
+  Transaction,
+  Notification,
+  Winner,
 } from '@/types'
+
+export type {
+  ApiResponse,
+  AuthResponse,
+  Draw,
+  DrawDetail,
+  DrawsResponse,
+  Ticket,
+  TicketsResponse,
+  TransactionsResponse,
+  NotificationsResponse,
+  UnreadCountResponse,
+  Wallet,
+  User,
+  Transaction,
+  Notification,
+  Winner,
+}
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 

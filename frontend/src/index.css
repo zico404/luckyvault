@@ -45,7 +45,6 @@
   }
 
   * {
-    @apply border-border;
     border-color: var(--vault-subtle);
   }
 

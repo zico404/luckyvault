@@ -9,7 +9,7 @@ export function DrawsPage() {
 
   useEffect(() => {
     api.getActiveDraws().then((res) => {
-      setDraws(res.data.draws || [])
+      setDraws(res.data || [])
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])

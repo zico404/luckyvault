@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { api, Draw } from '@/lib/api'
+import { api, DrawDetail } from '@/lib/api'
 import { ArrowLeft, Clock, Users, DollarSign, Trophy, Ticket } from 'lucide-react'
 
 export function DrawDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [draw, setDraw] = useState<Draw | null>(null)
+  const [draw, setDraw] = useState<DrawDetail | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -96,13 +96,13 @@ export function DrawDetailPage() {
           <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>Winners</h3>
           <div className="space-y-2">
             {draw.winners.map((w, i) => (
-              <div key={w.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--vault-charcoal)' }}>
+              <div key={i} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--vault-charcoal)' }}>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium" style={{ color: 'var(--champagne)' }}>#{i + 1}</span>
-                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{w.ticketCode}</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--champagne)' }}>#{w.rank}</span>
+                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{w.ticketId}</span>
                 </div>
-                {w.prizeAmount > 0 && (
-                  <span className="text-sm font-medium" style={{ color: 'var(--emerald)' }}>${w.prizeAmount.toFixed(2)}</span>
+                {w.prize > 0 && (
+                  <span className="text-sm font-medium" style={{ color: 'var(--emerald)' }}>${w.prize.toFixed(2)}</span>
                 )}
               </div>
             ))}

@@ -74,7 +74,7 @@ export function WalletPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                      {tx.type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                      {tx.type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase())}
                     </p>
                     {tx.description && (
                       <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>{tx.description}</p>
