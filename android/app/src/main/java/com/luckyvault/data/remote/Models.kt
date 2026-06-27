@@ -70,7 +70,11 @@ data class DrawDto(
     @SerializedName("winnerCount") val winnerCount: Int,
     @SerializedName("status") val status: String,
     @SerializedName("scheduledAt") val scheduledAt: String,
-    @SerializedName("completedAt") val completedAt: String?
+    @SerializedName("completedAt") val completedAt: String?,
+    @SerializedName("resultHash") val resultHash: String? = null,
+    @SerializedName("resultSalt") val resultSalt: String? = null,
+    @SerializedName("startedAt") val startedAt: String? = null,
+    @SerializedName("createdAt") val createdAt: String? = null
 )
 
 data class TicketDto(

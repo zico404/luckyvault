@@ -80,6 +80,14 @@ class ApiClient {
     })
 
     if (response.status === 401) {
+      const isAuthEndpoint = endpoint.includes('/auth/login') || endpoint.includes('/auth/register') || endpoint.includes('/auth/refresh')
+      if (isAuthEndpoint) {
+        const errorBody = await response.json().catch(() => ({}))
+        const message = errorBody.message || errorBody.error || 'Invalid credentials'
+        const err = new Error(message) as Error & { statusCode: number }
+        err.statusCode = 401
+        throw err
+      }
       if (this.refreshToken) {
         const refreshed = await this.attemptRefresh()
         if (refreshed) {
