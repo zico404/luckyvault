@@ -16,8 +16,8 @@ export class DrawsController {
   }
 
   @Get('completed')
-  async getCompletedDraws(@Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.drawsService.getCompletedDraws(page, limit);
+  async getCompletedDraws(@Query('page') page = '1', @Query('limit') limit = '20') {
+    const result = await this.drawsService.getCompletedDraws(parseInt(page, 10) || 1, parseInt(limit, 10) || 20);
     return successResponse(result);
   }
 

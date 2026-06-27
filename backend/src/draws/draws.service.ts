@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WalletService } from '../wallet/wallet.service';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -7,6 +7,7 @@ import { createHash, randomBytes } from 'crypto';
 
 @Injectable()
 export class DrawsService {
+  private readonly logger = new Logger(DrawsService.name);
   constructor(
     private prisma: PrismaService,
     private walletService: WalletService,
@@ -92,17 +93,21 @@ export class DrawsService {
   }
 
   async executeDraw(drawId: string) {
+    // Atomic lock: only one execution at a time
+    const locked = await this.prisma.draw.updateMany({
+      where: { id: drawId, status: { in: [DrawStatus.OPEN, DrawStatus.LOCKED] } },
+      data: { status: DrawStatus.LOCKED, startedAt: new Date() },
+    });
+
+    if (locked.count === 0) {
     const draw = await this.prisma.draw.findUnique({ where: { id: drawId } });
     if (!draw) throw new NotFoundException('Draw not found');
-    if (draw.status !== DrawStatus.OPEN && draw.status !== DrawStatus.LOCKED) {
+      if (!draw) throw new NotFoundException('Draw not found');
       throw new BadRequestException('Draw cannot be executed in current status');
     }
 
-    // Lock the draw
-    await this.prisma.draw.update({
-      where: { id: drawId },
-      data: { status: DrawStatus.LOCKED, startedAt: new Date() },
-    });
+    const draw = await this.prisma.draw.findUnique({ where: { id: drawId } });
+    if (!draw) throw new NotFoundException('Draw not found');
 
     try {
       // Fetch all valid tickets
@@ -131,7 +136,7 @@ export class DrawsService {
       const winnerCount = Math.min(draw.winnerCount, shuffled.length);
       const selectedWinners = shuffled.slice(0, winnerCount);
 
-      const prizePerWinner = Number(draw.prizePool) / winnerCount;
+      const prizePerWinner = Math.round((Number(draw.prizePool) / winnerCount) * 100) / 100;
 
       // Persist results atomically
       await this.prisma.$transaction(async (tx) => {
@@ -202,7 +207,9 @@ export class DrawsService {
           `Congratulations! You won $${prizePerWinner} from ${draw.title}!`,
           'WINNER',
           { drawId, prizeAmount: prizePerWinner },
-        ).catch(() => {});
+        ).catch((err) => {
+          this.logger.error(`Failed to send winner notification to ${ticket.userId}: ${err.message}`);
+        });
       }
 
       return { drawId, winners: selectedWinners.map((t, i) => ({ ticketId: t.id, userId: t.userId, prize: prizePerWinner, rank: i + 1 })), resultHash, resultSalt: salt };

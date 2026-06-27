@@ -9,8 +9,8 @@ export class NotificationsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getNotifications(@Req() req: any, @Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.notificationsService.getNotifications(req.user.id, page, limit);
+  async getNotifications(@Req() req: any, @Query('page') page = '1', @Query('limit') limit = '20') {
+    const result = await this.notificationsService.getNotifications(req.user.id, parseInt(page, 10) || 1, parseInt(limit, 10) || 20);
     return successResponse(result);
   }
 

@@ -38,14 +38,14 @@ export class AdminController {
   }
 
   @Get('users')
-  async getUsers(@Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.usersService.findAll(page, limit);
+  async getUsers(@Query('page') page = '1', @Query('limit') limit = '20') {
+    const result = await this.usersService.findAll(parseInt(page, 10) || 1, parseInt(limit, 10) || 20);
     return successResponse(result);
   }
 
   @Get('draws')
-  async getDraws(@Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.drawsService.getCompletedDraws(page, limit);
+  async getDraws(@Query('page') page = '1', @Query('limit') limit = '20') {
+    const result = await this.drawsService.getCompletedDraws(parseInt(page, 10) || 1, parseInt(limit, 10) || 20);
     return successResponse(result);
   }
 
@@ -104,13 +104,13 @@ export class AdminController {
 
   @Get('audit-logs')
   async getAuditLogs(
-    @Query('page') page = 1,
-    @Query('limit') limit = 50,
+    @Query('page') page = '1',
+    @Query('limit') limit = '50',
     @Query('userId') userId?: string,
     @Query('action') action?: any,
     @Query('entity') entity?: string,
   ) {
-    const result = await this.auditService.getLogs(page, limit, { userId, action, entity });
+    const result = await this.auditService.getLogs(parseInt(page, 10) || 1, parseInt(limit, 10) || 50, { userId, action, entity });
     return successResponse(result);
   }
 }

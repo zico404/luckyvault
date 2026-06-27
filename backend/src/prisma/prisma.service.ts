@@ -26,7 +26,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         }
       }
     }
-    this.logger.error('All database connection attempts failed');
+    this.logger.error('All database connection attempts failed — throwing to prevent app startup');
+    throw new Error('Failed to connect to database after 5 attempts');
   }
 
   isConnected(): boolean {
@@ -36,6 +37,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async onModuleDestroy() {
     try {
       await this.$disconnect();
-    } catch {}
+    } catch (err: any) {
+      this.logger.warn(`Error disconnecting from database: ${err.message}`);
+    }
   }
 }

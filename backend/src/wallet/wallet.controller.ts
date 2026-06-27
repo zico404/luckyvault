@@ -16,8 +16,8 @@ export class WalletController {
 
   @Get('transactions')
   @UseGuards(JwtAuthGuard)
-  async getTransactions(@Request() req, @Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.walletService.getTransactions(req.user.id, page, limit);
+  async getTransactions(@Request() req, @Query('page') page = '1', @Query('limit') limit = '20') {
+    const result = await this.walletService.getTransactions(req.user.id, parseInt(page, 10) || 1, parseInt(limit, 10) || 20);
     return successResponse(result);
   }
 

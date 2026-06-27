@@ -16,15 +16,15 @@ export class TicketsController {
 
   @Get('my')
   @UseGuards(JwtAuthGuard)
-  async getMyTickets(@Req() req: any, @Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.ticketsService.getMyTickets(req.user.id, page, limit);
+  async getMyTickets(@Req() req: any, @Query('page') page = '1', @Query('limit') limit = '20') {
+    const result = await this.ticketsService.getMyTickets(req.user.id, parseInt(page, 10) || 1, parseInt(limit, 10) || 20);
     return successResponse(result);
   }
 
   @Get('code/:code')
   @UseGuards(JwtAuthGuard)
-  async getTicketByCode(@Param('code') code: string) {
-    const ticket = await this.ticketsService.getTicketByCode(code);
+  async getTicketByCode(@Req() req: any, @Param('code') code: string) {
+    const ticket = await this.ticketsService.getTicketByCode(req.user.id, code);
     return successResponse(ticket);
   }
 
