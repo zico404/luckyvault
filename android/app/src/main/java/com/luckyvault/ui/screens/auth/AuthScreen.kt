@@ -2,6 +2,7 @@ package com.luckyvault.ui.screens.auth
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -269,9 +270,7 @@ fun AuthScreen(
                         },
                     shape = RoundedCornerShape(14.dp),
                     color = Color(0xFF000000),
-                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                        brush = Brush.linearGradient(listOf(Color(0xFF5F6368), Color(0xFF5F6368)))
-                    )
+                    border = BorderStroke(1.dp, Brush.linearGradient(listOf(Color(0xFF5F6368), Color(0xFF5F6368))))
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),

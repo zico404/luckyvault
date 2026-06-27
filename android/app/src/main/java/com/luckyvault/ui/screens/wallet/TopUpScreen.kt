@@ -1,5 +1,6 @@
 package com.luckyvault.ui.screens.wallet
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -289,12 +290,10 @@ private fun AmountChip(amount: Double, selected: Boolean, onClick: () -> Unit, m
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(10.dp),
         color = if (selected) Champagne else VaultCharcoal,
-        border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-            brush = Brush.linearGradient(listOf(
-                if (selected) Champagne else VaultSubtle,
-                if (selected) Champagne else VaultSubtle
-            ))
-        )
+        border = BorderStroke(1.dp, Brush.linearGradient(listOf(
+            if (selected) Champagne else VaultSubtle,
+            if (selected) Champagne else VaultSubtle
+        )))
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
