@@ -34,7 +34,8 @@ export type {
   Winner,
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://lucky-vault-backend-production.up.railway.app/api/v1'
+const _rawBase = import.meta.env.VITE_API_BASE_URL || 'https://lucky-vault-backend-production.up.railway.app/api/v1'
+const API_BASE = _rawBase.startsWith('http') ? _rawBase : `https://${_rawBase}/api/v1`
 
 class ApiClient {
   private token: string | null = null
