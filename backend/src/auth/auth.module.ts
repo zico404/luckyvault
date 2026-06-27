@@ -5,11 +5,13 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 
+const jwtSecret = process.env.JWT_SECRET;
+
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: jwtSecret || 'fallback-secret-set-jwt-secret-env',
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '15m' },
     }),
   ],

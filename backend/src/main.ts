@@ -4,8 +4,15 @@ import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
+
+  const required = ['DATABASE_URL', 'JWT_SECRET'];
+  const missing = required.filter((k) => !process.env[k]);
+  if (missing.length) {
+    logger.warn(`Missing env vars: ${missing.join(', ')}`);
+  }
+
+  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
   app.setGlobalPrefix('api/v1');
