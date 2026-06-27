@@ -13,7 +13,6 @@ import { AuditModule } from './audit/audit.module';
 import { RedisModule } from './common/redis.module';
 import { HealthModule } from './health/health.module';
 import { DownloadModule } from './download/download.module';
-import { TempModule } from './temp/temp.module';
 
 @Module({
   imports: [
@@ -23,7 +22,6 @@ import { TempModule } from './temp/temp.module';
     RedisModule,
     HealthModule,
     DownloadModule,
-    TempModule,
     AuthModule,
     UsersModule,
     WalletModule,
