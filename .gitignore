@@ -38,3 +38,4 @@ backend/node_modules/
 # Gradle
 .gradle/
 build/
+package-lock.json
