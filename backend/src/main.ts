@@ -18,23 +18,23 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   const corsOrigins = configService.get('CORS_ORIGINS', '');
-  const allowedOrigins = corsOrigins
-    ? corsOrigins.split(',').map((s: string) => s.trim())
+  const allowList = corsOrigins
+    ? corsOrigins.split(',').map((s: string) => s.trim()).filter(Boolean)
     : [];
+
+  logger.log(`CORS configured: ${allowList.length ? allowList.join(', ') : 'allow all origins'}`);
 
   app.use((req: any, res: any, next: any) => {
     const origin = req.headers.origin;
-    if (!origin) return next();
-
-    const isAllowed = allowedOrigins.length === 0 || allowedOrigins.includes(origin);
-
-    if (isAllowed) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Vary', 'Origin');
+    if (origin) {
+      const allowed = allowList.length === 0 || allowList.includes(origin);
+      if (allowed) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+      }
     }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept,X-Requested-With');
 
     if (req.method === 'OPTIONS') {
       res.status(204).end();
