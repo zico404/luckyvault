@@ -12,45 +12,47 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
-    onPrimary = OnPrimary,
-    primaryContainer = PrimaryVariant,
-    onPrimaryContainer = OnPrimary,
-    secondary = Gold,
+    primary = Gold,
+    onPrimary = Background,
+    primaryContainer = GoldDark,
+    onPrimaryContainer = OnSurface,
+    secondary = GoldLight,
     onSecondary = Background,
-    secondaryContainer = DarkGold,
+    secondaryContainer = GoldMuted,
     onSecondaryContainer = OnSurface,
     background = Background,
     onBackground = OnBackground,
     surface = Surface,
     onSurface = OnSurface,
-    surfaceVariant = SurfaceVariant,
-    onSurfaceVariant = OnBackground,
+    surfaceVariant = SurfaceElevated,
+    onSurfaceVariant = OnBackgroundMuted,
     error = Error,
     onError = OnPrimary,
-    outline = OnBackground.copy(alpha = 0.2f),
-    surfaceTint = SurfaceElevated,
+    outline = Gold.copy(alpha = 0.2f),
+    surfaceTint = Gold,
+    inverseSurface = OnSurface,
+    inverseOnSurface = Background,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Primary,
+    primary = GoldDark,
     onPrimary = OnPrimary,
-    primaryContainer = PrimaryLight,
+    primaryContainer = Gold,
     onPrimaryContainer = Background,
-    secondary = DarkGold,
+    secondary = Primary,
     onSecondary = OnPrimary,
-    secondaryContainer = Gold,
+    secondaryContainer = PrimaryLight,
     onSecondaryContainer = Background,
-    background = BackgroundLight,
-    onBackground = OnBackgroundLight,
-    surface = SurfaceLight,
-    onSurface = OnSurfaceLight,
-    surfaceVariant = SurfaceVariantLight,
-    onSurfaceVariant = OnBackgroundLight.copy(alpha = 0.7f),
+    background = Color(0xFFF5F5F0),
+    onBackground = Color(0xFF1A1A1A),
+    surface = Color.White,
+    onSurface = Color(0xFF1A1A1A),
+    surfaceVariant = Color(0xFFF0EDE8),
+    onSurfaceVariant = Color(0xFF666666),
     error = ErrorLight,
     onError = OnPrimary,
-    outline = OnBackgroundLight.copy(alpha = 0.2f),
-    surfaceTint = SurfaceElevatedLight,
+    outline = Color(0xFFCCCCCC),
+    surfaceTint = GoldDark,
 )
 
 @Composable
@@ -65,11 +67,13 @@ fun LuckyVaultTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 WindowCompat.setDecorFitsSystemWindows(window, false)
             }
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
         }
     }
 

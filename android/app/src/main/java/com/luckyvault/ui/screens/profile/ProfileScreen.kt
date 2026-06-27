@@ -47,7 +47,7 @@ fun ProfileScreen(
                     .size(88.dp)
                     .clip(CircleShape)
                     .background(
-                        Brush.linearGradient(listOf(Primary, PrimaryVariant, DarkGold))
+                        Brush.linearGradient(listOf(GoldDark, Gold, GoldLight))
                     ),
                 contentAlignment = Alignment.Center
             ) {

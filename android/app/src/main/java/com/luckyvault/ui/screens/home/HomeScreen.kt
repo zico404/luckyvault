@@ -14,9 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
-
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -115,25 +118,22 @@ fun HomeScreen(
                         Text(
                             "Active Draws",
                             style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = OnSurface,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
 
                     if (uiState.activeDraws.isEmpty()) {
                         item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
+                            GlassCard {
                                 Box(
                                     modifier = Modifier.padding(32.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         "No active draws available",
-                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                                        color = OnBackgroundMuted
                                     )
                                 }
                             }
@@ -156,34 +156,86 @@ fun HomeScreen(
 }
 
 @Composable
+fun GlassCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Surface.copy(alpha = 0.7f),
+                            Surface.copy(alpha = 0.5f)
+                        )
+                    )
+                )
+                .drawBehind {
+                    // Subtle gold border
+                    drawRect(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Gold.copy(alpha = 0.15f),
+                                Color.Transparent,
+                                Gold.copy(alpha = 0.08f)
+                            )
+                        ),
+                        style = Stroke(1f)
+                    )
+                }
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
 fun PremiumBalanceCard(balance: Double, onTopUp: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    Brush.horizontalGradient(
+                    brush = Brush.horizontalGradient(
                         colors = listOf(
-                            Primary.copy(alpha = 0.4f),
-                            MaterialTheme.colorScheme.surface
+                            GoldDark.copy(alpha = 0.15f),
+                            Surface.copy(alpha = 0.6f),
+                            Surface.copy(alpha = 0.8f)
                         )
                     )
                 )
+                .drawBehind {
+                    drawRect(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Gold.copy(alpha = 0.12f),
+                                Color.Transparent
+                            )
+                        ),
+                        style = Stroke(1f)
+                    )
+                }
                 .padding(24.dp)
         ) {
             Column {
                 Text(
                     "Total Balance",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                    color = OnBackgroundMuted
                 )
+                Spacer(Modifier.height(4.dp))
                 Text(
                     "$${String.format("%.2f", balance)}",
-                    color = Gold,
+                    brush = Brush.linearGradient(colors = listOf(GoldBright, Gold)),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -204,36 +256,30 @@ fun PremiumBalanceCard(balance: Double, onTopUp: () -> Unit) {
 
 @Composable
 fun QuickAction(icon: ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Card(
-        modifier = modifier.clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+    GlassCard(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .clickable { onClick() }
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(icon, null, tint = Gold, modifier = Modifier.size(28.dp))
             Spacer(Modifier.height(8.dp))
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = OnSurface)
         }
     }
 }
 
 @Composable
 fun PremiumDrawCard(draw: DrawDto, onBuyTicket: () -> Unit, onDetails: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+    GlassCard {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(draw.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text(draw.title, style = MaterialTheme.typography.titleMedium, color = OnSurface)
                 PremiumStatusBadge(draw.status)
             }
 
@@ -252,7 +298,10 @@ fun PremiumDrawCard(draw: DrawDto, onBuyTicket: () -> Unit, onDetails: () -> Uni
                     onClick = onBuyTicket,
                     modifier = Modifier.weight(1f),
                     enabled = draw.status == "OPEN" && draw.soldTickets < draw.maxTickets,
-                    colors = ButtonDefaults.buttonColors(containerColor = Gold),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Gold,
+                        disabledContainerColor = GoldDark.copy(alpha = 0.3f)
+                    ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Buy Ticket", color = Background, fontWeight = FontWeight.SemiBold)
@@ -261,7 +310,8 @@ fun PremiumDrawCard(draw: DrawDto, onBuyTicket: () -> Unit, onDetails: () -> Uni
                     onClick = onDetails,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = OnSurface),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(1.dp)
                 ) {
                     Text("Details")
                 }
@@ -276,11 +326,11 @@ fun PremiumStatusBadge(status: String) {
         "OPEN" -> Success to "Open"
         "UPCOMING" -> Gold to "Upcoming"
         "COMPLETED" -> PrimaryLight to "Completed"
-        else -> MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f) to status
+        else -> OnBackgroundMuted to status
     }
     Surface(
         shape = RoundedCornerShape(20.dp),
-        color = color.copy(alpha = 0.15f)
+        color = color.copy(alpha = 0.12f)
     ) {
         Text(
             text,
@@ -295,7 +345,7 @@ fun PremiumStatusBadge(status: String) {
 @Composable
 fun InfoColumn(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f))
+        Text(value, fontWeight = FontWeight.SemiBold, color = OnSurface)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = OnBackgroundMuted)
     }
 }

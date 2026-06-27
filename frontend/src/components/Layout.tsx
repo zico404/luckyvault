@@ -9,21 +9,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-function VaultLogo({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 108 108" className={className} xmlns="http://www.w3.org/2000/svg">
-      <circle cx="54" cy="54" r="42" fill="#C9A84C"/>
-      <circle cx="54" cy="54" r="38" fill="#0D1B0E"/>
-      <circle cx="54" cy="54" r="35" fill="none" stroke="#FFD700" strokeWidth="0.8" opacity="0.6"/>
-      <circle cx="54" cy="54" r="12" fill="#C9A84C"/>
-      <circle cx="54" cy="54" r="5" fill="#A08A3C"/>
-      <line x1="54" y1="43" x2="54" y2="65" stroke="#FFD700" strokeWidth="3.5" strokeLinecap="round"/>
-      <circle cx="54" cy="43" r="3" fill="#FFD700"/>
-      <circle cx="54" cy="65" r="3" fill="#FFD700"/>
-    </svg>
-  )
-}
+import { VaultLogo } from '@/components/VaultLogo'
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -57,11 +43,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Sidebar - Desktop */}
       <aside className="hidden md:flex flex-col w-64 glass-nav p-4 border-r border-white/5">
         <Link to="/" className="flex items-center gap-3 px-4 py-6 mb-8">
-          <VaultLogo className="w-10 h-10" />
-          <div>
-            <span className="text-xl font-black text-gold">LUCKY</span>
-            <span className="text-xl font-black text-white/90"> VAULT</span>
-          </div>
+          <VaultLogo size={40} />
+          <span className="text-xl font-black tracking-wider bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+            LUCKY VAULT
+          </span>
         </Link>
 
         <nav className="flex-1 space-y-1">
@@ -99,10 +84,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between px-4 py-4 glass-nav border-b border-white/5">
           <Link to="/" className="flex items-center gap-2">
-            <VaultLogo className="w-8 h-8" />
-            <span className="text-lg font-black">
-              <span className="text-gold">LUCKY</span>{' '}
-              <span className="text-white/90">VAULT</span>
+            <VaultLogo size={32} />
+            <span className="text-lg font-black tracking-wider bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+              LUCKY VAULT
             </span>
           </Link>
         </header>

@@ -1,76 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#1a2e1a"/>
-      <stop offset="100%" stop-color="#0a120a"/>
-    </radialGradient>
-    <radialGradient id="glow" cx="50%" cy="40%" r="50%">
-      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFD700"/>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5D060"/>
       <stop offset="50%" stop-color="#C9A84C"/>
-      <stop offset="100%" stop-color="#A08A3C"/>
+      <stop offset="100%" stop-color="#A08030"/>
     </linearGradient>
-    <linearGradient id="goldBright" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFE44D"/>
-      <stop offset="50%" stop-color="#FFD700"/>
-      <stop offset="100%" stop-color="#C9A84C"/>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1A2E1C"/>
+      <stop offset="100%" stop-color="#0A120B"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE88A"/>
+      <stop offset="50%" stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#8A7020"/>
     </linearGradient>
   </defs>
-  
-  <!-- Background -->
-  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  
-  <!-- Ambient glow -->
-  <circle cx="256" cy="256" r="240" fill="url(#glow)"/>
-  
-  <!-- Outer ring shadow -->
-  <circle cx="256" cy="256" r="220" fill="none" stroke="#1a1a1a" stroke-width="12"/>
-  
-  <!-- Gold dial ring -->
-  <circle cx="256" cy="256" r="200" fill="url(#gold)"/>
-  <circle cx="256" cy="256" r="184" fill="#0D1B0E"/>
-  
-  <!-- Inner ring glow -->
-  <circle cx="256" cy="256" r="178" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.4"/>
-  
-  <!-- Tick marks -->
-  <g stroke-linecap="round">
-    <line x1="256" y1="68" x2="256" y2="100" stroke="#C9A84C" stroke-width="12"/>
-    <line x1="348" y1="94" x2="332" y2="122" stroke="#8A7A3A" stroke-width="8"/>
-    <line x1="414" y1="160" x2="386" y2="176" stroke="#8A7A3A" stroke-width="8"/>
-    <line x1="444" y1="256" x2="412" y2="256" stroke="#C9A84C" stroke-width="12"/>
-    <line x1="414" y1="352" x2="386" y2="336" stroke="#8A7A3A" stroke-width="8"/>
-    <line x1="348" y1="418" x2="332" y2="390" stroke="#8A7A3A" stroke-width="8"/>
-    <line x1="256" y1="444" x2="256" y2="412" stroke="#C9A84C" stroke-width="12"/>
-    <line x1="164" y1="418" x2="180" y2="390" stroke="#8A7A3A" stroke-width="8"/>
-    <line x1="98" y1="352" x2="126" y2="336" stroke="#8A7A3A" stroke-width="8"/>
-    <line x1="68" y1="256" x2="100" y2="256" stroke="#C9A84C" stroke-width="12"/>
-    <line x1="98" y1="160" x2="126" y2="176" stroke="#8A7A3A" stroke-width="8"/>
-    <line x1="164" y1="94" x2="180" y2="122" stroke="#8A7A3A" stroke-width="8"/>
-  </g>
-  
-  <!-- Center knob shadow -->
-  <circle cx="256" cy="256" r="68" fill="none" stroke="#2a1a0a" stroke-width="6"/>
-  
-  <!-- Center knob -->
-  <circle cx="256" cy="256" r="58" fill="url(#goldBright)"/>
-  
-  <!-- Knob inner -->
-  <circle cx="256" cy="256" r="26" fill="#A08A3C"/>
-  <circle cx="256" cy="256" r="20" fill="#C9A84C" opacity="0.6"/>
-  
-  <!-- Handle bar -->
-  <line x1="256" y1="192" x2="256" y2="320" stroke="#FFE44D" stroke-width="16" stroke-linecap="round"/>
-  
-  <!-- Handle knobs -->
-  <circle cx="256" cy="192" r="12" fill="#FFE44D"/>
-  <circle cx="256" cy="192" r="6" fill="#FFD700"/>
-  <circle cx="256" cy="320" r="12" fill="#FFE44D"/>
-  <circle cx="256" cy="320" r="6" fill="#FFD700"/>
-  
-  <!-- Highlight -->
-  <ellipse cx="220" cy="180" rx="40" ry="20" fill="white" opacity="0.08" transform="rotate(-30 220 180)"/>
+  <circle cx="60" cy="60" r="56" fill="url(#g2)"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="url(#g3)" stroke-width="5"/>
+  <circle cx="60" cy="60" r="47" fill="none" stroke="#C9A84C" stroke-width="0.8" opacity="0.4"/>
+  <line x1="60" y1="13" x2="60" y2="22" stroke="#FFE88A" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="98" x2="60" y2="107" stroke="#FFE88A" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="13" y1="60" x2="22" y2="60" stroke="#FFE88A" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="98" y1="60" x2="107" y2="60" stroke="#FFE88A" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="27" y1="27" x2="33" y2="33" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="87" y1="27" x2="93" y2="33" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="27" y1="87" x2="33" y2="93" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <line x1="87" y1="87" x2="93" y2="93" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <circle cx="60" cy="60" r="16" fill="none" stroke="#A08030" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="14" fill="url(#g1)"/>
+  <circle cx="60" cy="60" r="10" fill="none" stroke="#A08030" stroke-width="0.8" opacity="0.5"/>
+  <circle cx="60" cy="60" r="4" fill="#0D1B0E"/>
+  <line x1="60" y1="46" x2="60" y2="74" stroke="#FFE88A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="60" cy="46" r="2.5" fill="#FFE88A"/>
+  <circle cx="60" cy="74" r="2.5" fill="#FFE88A"/>
 </svg>
