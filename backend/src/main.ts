@@ -17,15 +17,30 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
 
-  const isDev = configService.get('NODE_ENV') !== 'production';
   const corsOrigins = configService.get('CORS_ORIGINS', '');
-  app.enableCors({
-    origin: corsOrigins
-      ? corsOrigins.split(',').map((s: string) => s.trim())
-      : isDev
-        ? true
-        : true,
-    credentials: true,
+  const allowedOrigins = corsOrigins
+    ? corsOrigins.split(',').map((s: string) => s.trim())
+    : [];
+
+  app.use((req: any, res: any, next: any) => {
+    const origin = req.headers.origin;
+    if (!origin) return next();
+
+    const isAllowed = allowedOrigins.length === 0 || allowedOrigins.includes(origin);
+
+    if (isAllowed) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept');
+
+    if (req.method === 'OPTIONS') {
+      res.status(204).end();
+      return;
+    }
+    next();
   });
 
   app.useGlobalPipes(
@@ -40,6 +55,6 @@ async function bootstrap() {
 
   const port = configService.get('PORT', 3000);
   await app.listen(port);
-  logger.log(`Lucky Vault API running on port ${port} (${isDev ? 'development' : 'production'})`);
+  logger.log(`Lucky Vault API running on port ${port}`);
 }
 bootstrap();
