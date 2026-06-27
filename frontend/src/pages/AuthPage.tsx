@@ -156,11 +156,10 @@ export function AuthPage() {
             </button>
           </div>
 
-          {/* Get it on Play Store */}
+          {/* Download APK */}
           <a
-            href="https://play.google.com/store/apps/details?id=com.luckyvault"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`${import.meta.env.VITE_API_URL || 'https://lucky-vault-backend-production.up.railway.app'}/api/v1/download/apk`}
+            download="LuckyVault.apk"
             className="flex items-center justify-center gap-3 w-full h-12 rounded-xl transition-all duration-200 hover:scale-[1.01]"
             style={{
               background: '#000',

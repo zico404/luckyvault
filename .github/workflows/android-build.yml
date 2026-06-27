@@ -282,6 +282,22 @@ jobs:
             fi
           fi
 
+      - name: Create GitHub Release with APK
+        if: success()
+        run: |
+          cd "${{ github.workspace }}"
+          VERSION=$(grep 'versionName' android/app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          APK_FILE="apks/LuckyVault-v${VERSION}.apk"
+          if [ -f "$APK_FILE" ]; then
+            cp "$APK_FILE" apks/LuckyVault.apk
+            gh release delete "v${VERSION}" --yes --cleanup-tag 2>/dev/null || true
+            gh release create "v${VERSION}" apks/LuckyVault.apk \
+              --title "Lucky Vault v${VERSION}" \
+              --notes "Lucky Vault Android APK v${VERSION}" \
+              --latest
+            echo "Release v${VERSION} created with stable download URL"
+          fi
+
   summary:
     name: Build Summary
     runs-on: ubuntu-latest

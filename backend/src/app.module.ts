@@ -12,6 +12,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { AuditModule } from './audit/audit.module';
 import { RedisModule } from './common/redis.module';
 import { HealthModule } from './health/health.module';
+import { DownloadModule } from './download/download.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { HealthModule } from './health/health.module';
     PrismaModule,
     RedisModule,
     HealthModule,
+    DownloadModule,
     AuthModule,
     UsersModule,
     WalletModule,
