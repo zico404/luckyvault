@@ -284,6 +284,8 @@ jobs:
 
       - name: Create GitHub Release with APK
         if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           cd "${{ github.workspace }}"
           VERSION=$(grep 'versionName' android/app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
