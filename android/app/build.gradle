@@ -47,7 +47,7 @@ android {
     buildTypes {
         debug {
             // Local development — backend runs on localhost
-            buildConfigField "String", "API_BASE_URL", '"http://10.0.2.2:3000/api/v1/"'
+            buildConfigField "String", "API_BASE_URL", '"https://lucky-vault-backend-production.up.railway.app/api/v1/"'
             buildConfigField "String", "SUPABASE_URL", '"https://kiogfskwxjgjbjqnwdyh.supabase.co"'
             buildConfigField "Boolean", "IS_DEBUG", "true"
         }
