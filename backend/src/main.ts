@@ -24,7 +24,7 @@ async function bootstrap() {
       ? true
       : corsOrigins
         ? corsOrigins.split(',').map((s: string) => s.trim())
-        : [/\.luckyvault\.app$/],
+        : [/\.luckyvault\.app$/, /\.vercel\.app$/],
     credentials: true,
   });
 
