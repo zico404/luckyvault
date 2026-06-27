@@ -1,140 +1,120 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { api } from '@/lib/api'
-import { formatCurrency, formatDateTime } from '@/lib/utils'
-import type { DrawDetail as DrawDetailType } from '@/types'
-import {
-  ArrowLeft,
-  Clock,
-  Ticket,
-  Trophy,
-  Medal,
-  Award,
-} from 'lucide-react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { api, Draw } from '@/lib/api'
+import { ArrowLeft, Clock, Users, DollarSign, Trophy, Ticket } from 'lucide-react'
 
 export function DrawDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [draw, setDraw] = useState<DrawDetailType | null>(null)
+  const [draw, setDraw] = useState<Draw | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (id) {
       api.getDraw(id).then((res) => {
-        if (res.success) setDraw(res.data)
-      }).finally(() => setLoading(false))
+        setDraw(res.data)
+        setLoading(false)
+      }).catch(() => setLoading(false))
     }
   }, [id])
 
   if (loading) {
     return (
-      <div className="space-y-4">
-        <div className="h-48 shimmer rounded-3xl" />
-        <div className="h-24 shimmer rounded-3xl" />
+      <div className="space-y-4 animate-fade-in">
+        <div className="shimmer h-8 w-48" />
+        <div className="vault-card p-6"><div className="shimmer h-40 w-full" /></div>
       </div>
     )
   }
 
   if (!draw) {
     return (
-      <div className="text-center py-12">
-        <p className="text-white/40">Draw not found</p>
-        <button onClick={() => navigate('/draws')} className="mt-4 text-gold hover:underline text-sm">
-          Back to Draws
-        </button>
+      <div className="vault-card p-12 text-center">
+        <p style={{ color: 'var(--text-secondary)' }}>Draw not found</p>
       </div>
     )
   }
 
-  const rankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="w-6 h-6 text-gold" />
-    if (rank === 2) return <Medal className="w-6 h-6 text-gray-400" />
-    if (rank === 3) return <Award className="w-6 h-6 text-amber-600" />
-    return <Award className="w-6 h-6 text-white/30" />
-  }
-
   return (
-    <div className="space-y-6 animate-fade-in max-w-2xl mx-auto">
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-white/30 hover:text-white/70 transition-colors text-sm"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back
+    <div className="space-y-6 animate-fade-in">
+      <button onClick={() => navigate(-1)} className="btn-ghost -ml-2">
+        <ArrowLeft className="w-4 h-4" /> Back
       </button>
 
-      <div className="glass-card p-8 text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20"
-          style={{ background: 'linear-gradient(180deg, hsl(120 54% 24% / 0.4) 0%, transparent 60%)' }} />
-        <div className="relative z-10">
-          <h1 className="text-2xl font-bold text-white mb-2">{draw.title}</h1>
-          {draw.description && (
-            <p className="text-white/40 mb-4 text-sm">{draw.description}</p>
-          )}
-          <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Prize Pool</p>
-          <p className="text-4xl font-black text-gold gold-glow">{formatCurrency(draw.prizePool)}</p>
+      {/* Header card */}
+      <div className="vault-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>{draw.title}</h1>
+          <span className="vault-badge vault-badge-success">{draw.status}</span>
+        </div>
+        <p className="text-3xl font-light" style={{ color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+          ${draw.prizePool.toFixed(2)}
+        </p>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Prize pool</p>
+      </div>
+
+      {/* Stats */}
+      <div className="vault-card p-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Ticket price</p>
+            <p className="text-base font-medium mt-1" style={{ color: 'var(--text-primary)' }}>${draw.ticketPrice.toFixed(2)}</p>
+          </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Sold</p>
+            <p className="text-base font-medium mt-1" style={{ color: 'var(--text-primary)' }}>{draw.soldTickets}</p>
+          </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Remaining</p>
+            <p className="text-base font-medium mt-1" style={{ color: 'var(--text-primary)' }}>{draw.maxTickets - draw.soldTickets}</p>
+          </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Winners</p>
+            <p className="text-base font-medium mt-1" style={{ color: 'var(--text-primary)' }}>{draw.winnerCount}</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: 'Price', value: formatCurrency(draw.ticketPrice) },
-          { label: 'Winners', value: draw.winnerCount.toString() },
-          { label: 'Status', value: draw.status },
-        ].map((stat) => (
-          <div key={stat.label} className="glass-card p-3 text-center">
-            <p className="text-sm font-bold text-white">{stat.value}</p>
-            <p className="text-[10px] text-white/30 mt-0.5">{stat.label}</p>
+      {/* Draw info */}
+      <div className="vault-card p-5">
+        <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>Draw information</h3>
+        <div className="space-y-3">
+          <div className="flex justify-between">
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Scheduled time</span>
+            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{new Date(draw.scheduledAt).toLocaleString()}</span>
           </div>
-        ))}
-        {[
-          { label: 'Sold', value: draw.soldTickets.toString() },
-          { label: 'Max', value: draw.maxTickets.toString() },
-          { label: 'Left', value: (draw.maxTickets - draw.soldTickets).toString() },
-        ].map((stat) => (
-          <div key={stat.label} className="glass-card p-3 text-center">
-            <p className="text-sm font-bold text-white">{stat.value}</p>
-            <p className="text-[10px] text-white/30 mt-0.5">{stat.label}</p>
+          <div className="flex justify-between">
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Status</span>
+            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{draw.status}</span>
           </div>
-        ))}
-      </div>
-
-      <div className="glass-card p-4 flex items-center gap-3">
-        <Clock className="w-4 h-4 text-gold" />
-        <div>
-          <p className="text-[10px] text-white/30">Draw Time</p>
-          <p className="text-white/80 text-sm font-medium">{formatDateTime(draw.scheduledAt)}</p>
         </div>
       </div>
 
-      {draw.status === 'COMPLETED' && draw.winners.length > 0 && (
-        <div>
-          <h3 className="text-lg font-bold text-white mb-3">Winners</h3>
+      {/* Winners */}
+      {draw.status === 'COMPLETED' && draw.winners && draw.winners.length > 0 && (
+        <div className="vault-card p-5">
+          <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>Winners</h3>
           <div className="space-y-2">
-            {draw.winners.map((winner) => (
-              <div key={winner.ticketId} className="glass-card p-4 flex items-center justify-between">
+            {draw.winners.map((w, i) => (
+              <div key={w.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--vault-charcoal)' }}>
                 <div className="flex items-center gap-3">
-                  {rankIcon(winner.rank)}
-                  <div>
-                    <p className="text-white/80 font-semibold text-sm">#{winner.rank} Winner</p>
-                    <p className="text-[10px] text-white/30">Ticket: {winner.ticketId.slice(0, 8)}...</p>
-                  </div>
+                  <span className="text-sm font-medium" style={{ color: 'var(--champagne)' }}>#{i + 1}</span>
+                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{w.ticketCode}</span>
                 </div>
-                <p className="text-sm font-bold text-green-400">+{formatCurrency(winner.prize)}</p>
+                {w.prizeAmount > 0 && (
+                  <span className="text-sm font-medium" style={{ color: 'var(--emerald)' }}>${w.prizeAmount.toFixed(2)}</span>
+                )}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {draw.status === 'OPEN' && draw.soldTickets < draw.maxTickets && (
-        <button
-          onClick={() => navigate(`/draws/${draw.id}/buy`)}
-          className="w-full py-4 btn-gold flex items-center justify-center gap-2 text-sm"
-        >
-          <Ticket className="w-4 h-4" />
-          Buy Ticket — {formatCurrency(draw.ticketPrice)}
-        </button>
+      {/* Buy button */}
+      {draw.status === 'OPEN' && (
+        <Link to={`/draws/${draw.id}/buy`} className="btn-primary w-full h-12 text-center block">
+          Buy ticket for ${draw.ticketPrice.toFixed(2)}
+        </Link>
       )}
     </div>
   )

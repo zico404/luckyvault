@@ -1,151 +1,159 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { api } from '@/lib/api'
-import { formatCurrency } from '@/lib/utils'
-import type { Wallet, Draw } from '@/types'
-import {
-  Wallet as WalletIcon,
-  Ticket,
-  ArrowRight,
-  TrendingUp,
-  Users,
-  Clock,
-} from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '@/lib/auth'
+import { VaultMark } from '@/components/VaultLogo'
+import { LayoutDashboard, Ticket, Wallet, Bell, User, ArrowRight, TrendingUp, Clock, Trophy } from 'lucide-react'
+
+interface DashboardStats {
+  balance: number
+  activeDraws: number
+  totalTickets: number
+  recentWins: number
+}
 
 export function DashboardPage() {
-  const navigate = useNavigate()
-  const [wallet, setWallet] = useState<Wallet | null>(null)
-  const [activeDraws, setActiveDraws] = useState<Draw[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    Promise.all([
-      api.getBalance(),
-      api.getActiveDraws(),
-    ]).then(([walletRes, drawsRes]) => {
-      if (walletRes.success) setWallet(walletRes.data)
-      if (drawsRes.success) setActiveDraws(drawsRes.data)
-    }).finally(() => setLoading(false))
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-32 shimmer rounded-3xl" />
-        ))}
-      </div>
-    )
-  }
+  const { user } = useAuth()
+  const [stats] = useState<DashboardStats>({
+    balance: 0,
+    activeDraws: 3,
+    totalTickets: 12,
+    recentWins: 2,
+  })
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Balance Card */}
-      <div className="relative overflow-hidden glass-card p-6 md:p-8">
-        {/* Glow effect */}
-        <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-20 blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(circle, hsl(45 100% 50% / 0.6) 0%, transparent 70%)' }} />
-        <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full opacity-15 blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(circle, hsl(120 54% 24% / 0.5) 0%, transparent 70%)' }} />
-
-        <div className="relative z-10">
-          <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Total Balance</p>
-          <h2 className="text-4xl md:text-5xl font-black text-gold gold-glow">
-            {formatCurrency(wallet?.balance ?? 0)}
-          </h2>
-          <button
-            onClick={() => navigate('/wallet')}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 btn-gold text-sm"
-          >
-            <WalletIcon className="w-4 h-4" />
-            Top Up
-          </button>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { icon: Ticket, label: 'Active Draws', value: activeDraws.length.toString(), color: 'text-gold' },
-          { icon: TrendingUp, label: 'Win Rate', value: '—', color: 'text-green-400' },
-          { icon: Users, label: 'Players', value: '—', color: 'text-blue-400' },
-          { icon: Clock, label: 'Next Draw', value: activeDraws[0]?.title ?? 'None', color: 'text-purple-400' },
-        ].map((stat) => (
-          <div key={stat.label} className="glass-card p-4">
-            <stat.icon className={`w-5 h-5 ${stat.color} mb-3`} />
-            <p className="text-xl font-bold text-white truncate">{stat.value}</p>
-            <p className="text-[11px] text-white/30 mt-0.5">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Active Draws */}
+      {/* Welcome header */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-white">Active Draws</h3>
-          <button
-            onClick={() => navigate('/draws')}
-            className="text-xs text-gold/70 hover:text-gold transition-colors flex items-center gap-1"
-          >
-            View all <ArrowRight className="w-3 h-3" />
-          </button>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)', letterSpacing: '-0.25px' }}>
+          Welcome back{user?.displayName ? `, ${user.displayName}` : ''}
+        </h1>
+        <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+          Here's your account overview
+        </p>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={<Wallet className="w-5 h-5" />}
+          label="Balance"
+          value={`$${stats.balance.toFixed(2)}`}
+          href="/wallet"
+        />
+        <StatCard
+          icon={<Ticket className="w-5 h-5" />}
+          label="Active draws"
+          value={stats.activeDraws.toString()}
+          href="/draws"
+        />
+        <StatCard
+          icon={<LayoutDashboard className="w-5 h-5" />}
+          label="Total tickets"
+          value={stats.totalTickets.toString()}
+          href="/tickets"
+        />
+        <StatCard
+          icon={<Trophy className="w-5 h-5" />}
+          label="Recent wins"
+          value={stats.recentWins.toString()}
+          href="/tickets"
+          accent
+        />
+      </div>
+
+      {/* Quick actions */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+          Quick actions
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <QuickAction
+            icon={<Ticket className="w-5 h-5" />}
+            title="Buy ticket"
+            description="Enter an active draw"
+            href="/draws"
+          />
+          <QuickAction
+            icon={<Wallet className="w-5 h-5" />}
+            title="Top up wallet"
+            description="Add funds to your account"
+            href="/wallet"
+          />
+          <QuickAction
+            icon={<Bell className="w-5 h-5" />}
+            title="Notifications"
+            description="Check recent alerts"
+            href="/notifications"
+          />
         </div>
+      </div>
 
-        <div className="space-y-3">
-          {activeDraws.length === 0 ? (
-            <div className="glass-card p-10 text-center">
-              <Ticket className="w-10 h-10 text-white/10 mx-auto mb-3" />
-              <p className="text-white/30 text-sm">No active draws available</p>
-            </div>
-          ) : (
-            activeDraws.map((draw) => (
-              <div
-                key={draw.id}
-                className="glass-card p-5 hover:border-gold/20 transition-all duration-200 cursor-pointer"
-                onClick={() => navigate(`/draws/${draw.id}`)}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-base font-semibold text-white">{draw.title}</h4>
-                  <span className="px-2.5 py-1 bg-gold/10 text-gold text-[10px] font-medium rounded-full border border-gold/20">
-                    {draw.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="text-center">
-                    <p className="text-base font-bold text-gold">{formatCurrency(draw.prizePool)}</p>
-                    <p className="text-[10px] text-white/30">Prize Pool</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-base font-bold text-white">{formatCurrency(draw.ticketPrice)}</p>
-                    <p className="text-[10px] text-white/30">Per Ticket</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-base font-bold text-white">{draw.soldTickets}/{draw.maxTickets}</p>
-                    <p className="text-[10px] text-white/30">Sold</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); navigate(`/draws/${draw.id}/buy`) }}
-                    disabled={draw.status !== 'OPEN' || draw.soldTickets >= draw.maxTickets}
-                    className="flex-1 py-2 btn-gold text-xs disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    Buy Ticket
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); navigate(`/draws/${draw.id}`) }}
-                    className="flex-1 py-2 glass-card text-white/60 text-xs font-medium hover:text-white transition-colors"
-                  >
-                    Details
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+      {/* Recent activity placeholder */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+          Recent activity
+        </h2>
+        <div className="vault-card p-8 text-center">
+          <Clock className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--text-disabled)' }} />
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            No recent activity. Buy a ticket to get started.
+          </p>
         </div>
       </div>
     </div>
+  )
+}
+
+function StatCard({ icon, label, value, href, accent }: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  href: string
+  accent?: boolean
+}) {
+  return (
+    <Link to={href} className="vault-card p-5 block group hover:border-[rgba(201,169,98,0.15)] transition-all duration-200">
+      <div className="flex items-center justify-between mb-3">
+        <div
+          className="w-9 h-9 rounded-lg flex items-center justify-center"
+          style={{ background: accent ? 'rgba(5, 150, 105, 0.1)' : 'var(--champagne-subtle)' }}
+        >
+          <span style={{ color: accent ? 'var(--emerald)' : 'var(--champagne)' }}>{icon}</span>
+        </div>
+        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--text-muted)' }} />
+      </div>
+      <p className="text-2xl font-light" style={{ color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+        {value}
+      </p>
+      <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+        {label}
+      </p>
+    </Link>
+  )
+}
+
+function QuickAction({ icon, title, description, href }: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  href: string
+}) {
+  return (
+    <Link
+      to={href}
+      className="vault-card p-5 flex items-center gap-4 group hover:border-[rgba(201,169,98,0.15)] transition-all duration-200"
+    >
+      <div
+        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+        style={{ background: 'var(--champagne-subtle)' }}
+      >
+        <span style={{ color: 'var(--champagne)' }}>{icon}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{title}</p>
+        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{description}</p>
+      </div>
+      <ArrowRight className="w-4 h-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--text-muted)' }} />
+    </Link>
   )
 }

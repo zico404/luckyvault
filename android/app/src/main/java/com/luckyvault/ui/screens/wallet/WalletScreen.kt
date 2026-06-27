@@ -1,10 +1,9 @@
 package com.luckyvault.ui.screens.wallet
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,28 +11,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.luckyvault.data.remote.TransactionDto
-import com.luckyvault.ui.components.ErrorRetryView
 import com.luckyvault.ui.components.LuckyVaultTopBar
-import com.luckyvault.ui.components.ShimmerCard
 import com.luckyvault.ui.theme.*
-import com.luckyvault.ui.util.safeDateShort
-
-data class TopUpOption(val label: String, val amount: Double)
-
-private val topUpOptions = listOf(
-    TopUpOption("$10", 10.0),
-    TopUpOption("$25", 25.0),
-    TopUpOption("$50", 50.0),
-    TopUpOption("$100", 100.0),
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,207 +32,165 @@ fun WalletScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showTopUp by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Wallet", onBack = onBack) },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = VaultBlack
     ) { padding ->
-        Box(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (uiState.isLoading && uiState.transactions.isEmpty()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp)
+            // Balance card
+            item {
+                Spacer(Modifier.height(4.dp))
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = VaultGraphite
                 ) {
-                    items(4) { ShimmerCard() }
-                }
-            } else if (uiState.error != null && uiState.transactions.isEmpty()) {
-                ErrorRetryView(
-                    message = uiState.error,
-                    onRetry = { viewModel.loadData() }
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp)
-                ) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(24.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(Primary.copy(alpha = 0.3f), MaterialTheme.colorScheme.surface)
-                                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .drawBehind {
+                                drawRect(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(Champagne.copy(alpha = 0.06f), Color.Transparent)
                                     )
-                                    .padding(24.dp)
-                            ) {
-                                Column {
-                                    Text(
-                                        "Available Balance",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                                    )
-                                    Text(
-                                        "$${String.format("%.2f", uiState.wallet?.balance ?: 0.0)}",
-                                        fontSize = 36.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Gold
-                                    )
-                                    Spacer(Modifier.height(16.dp))
-                                    Button(
-                                        onClick = { showTopUp = true },
-                                        colors = ButtonDefaults.buttonColors(containerColor = Gold),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ) {
-                                        Icon(Icons.Default.Add, null, tint = Background, modifier = Modifier.size(18.dp))
-                                        Spacer(Modifier.width(8.dp))
-                                        Text("Top Up", color = Background, fontWeight = FontWeight.SemiBold)
-                                    }
+                                )
+                            }
+                            .padding(24.dp)
+                    ) {
+                        Column {
+                            Text("Available balance", style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                "$${String.format("%.2f", uiState.wallet?.balance ?: 0.0)}",
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.Light,
+                                color = TextPrimary
+                            )
+                            Spacer(Modifier.height(20.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Button(
+                                    onClick = { showTopUp = true },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Champagne, contentColor = VaultBlack),
+                                    shape = RoundedCornerShape(10.dp),
+                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+                                ) {
+                                    Icon(Icons.Default.Add, null, modifier = Modifier.size(16.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Top up", fontWeight = FontWeight.Medium, fontSize = 13.sp)
                                 }
                             }
                         }
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            "Transactions",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-
-                    if (uiState.transactions.isEmpty()) {
-                        item {
-                            Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                                Text(
-                                    "No transactions yet",
-                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
-                                )
-                            }
-                        }
-                    } else {
-                        itemsIndexed(uiState.transactions) { index, tx ->
-                            PremiumTransactionItem(tx)
-                            if (index == uiState.transactions.lastIndex && uiState.page < uiState.totalPages) {
-                                viewModel.loadMore()
-                            }
-                        }
                     }
                 }
             }
+
+            // Transactions header
+            item {
+                Spacer(Modifier.height(4.dp))
+                Text("Transactions", style = MaterialTheme.typography.titleLarge, color = TextPrimary)
+            }
+
+            // Transaction list
+            if (uiState.transactions.isEmpty()) {
+                item {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        color = VaultGraphite
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(40.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(Icons.Default.receipt_long, null, tint = TextDisabled, modifier = Modifier.size(40.dp))
+                            Spacer(Modifier.height(12.dp))
+                            Text("No transactions yet", color = TextSecondary, style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
+                }
+            } else {
+                items(uiState.transactions) { tx ->
+                    TransactionRow(tx)
+                }
+            }
+
+            item { Spacer(Modifier.height(8.dp)) }
         }
     }
 
+    // Top up dialog
     if (showTopUp) {
-        TopUpDialog(
-            onDismiss = { showTopUp = false },
-            onTopUp = { amount ->
-                viewModel.topUp(amount)
-                showTopUp = false
-            }
+        AlertDialog(
+            onDismissRequest = { showTopUp = false },
+            title = { Text("Top up wallet", fontWeight = FontWeight.SemiBold) },
+            text = { Text("Select an amount to add to your wallet.", color = TextSecondary) },
+            confirmButton = {
+                Button(
+                    onClick = { showTopUp = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Champagne, contentColor = VaultBlack),
+                    shape = RoundedCornerShape(10.dp)
+                ) { Text("Confirm") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTopUp = false }) {
+                    Text("Cancel", color = TextSecondary)
+                }
+            },
+            containerColor = VaultGraphite,
+            titleContentColor = TextPrimary,
+            shape = RoundedCornerShape(20.dp)
         )
     }
 }
 
 @Composable
-fun TopUpDialog(onDismiss: () -> Unit, onTopUp: (Double) -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text("Top Up Wallet", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(
-                    "Select amount to deposit:",
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    topUpOptions.take(2).forEach { option ->
-                        Button(
-                            onClick = { onTopUp(option.amount) },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Gold),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(option.label, color = Background, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    topUpOptions.drop(2).forEach { option ->
-                        Button(
-                            onClick = { onTopUp(option.amount) },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Gold),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(option.label, color = Background, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = MaterialTheme.colorScheme.error)
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.surface
-    )
-}
-
-@Composable
-fun PremiumTransactionItem(tx: TransactionDto) {
-    val (icon, color) = when (tx.type) {
-        "DEPOSIT" -> Icons.Default.AddCircle to Success
-        "PURCHASE" -> Icons.Default.RemoveCircle to MaterialTheme.colorScheme.error
-        "WINNING" -> Icons.Default.EmojiEvents to Gold
-        "REFUND" -> Icons.Default.Replay to MaterialTheme.colorScheme.secondary
-        else -> Icons.Default.Circle to MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+private fun TransactionRow(tx: com.luckyvault.data.remote.TransactionDto) {
+    val icon = when (tx.type) {
+        "TOP_UP" -> Icons.Default.add_circle
+        "PURCHASE" -> Icons.Default.remove_circle
+        "WINNING" -> Icons.Default.emoji_events
+        "WITHDRAWAL" -> Icons.Default.arrow_upward
+        else -> Icons.Default.circle
     }
+    val color = when (tx.type) {
+        "TOP_UP", "WINNING" -> Emerald
+        "PURCHASE", "WITHDRAWAL" -> Crimson
+        else -> TextMuted
+    }
+    val sign = if (tx.type in listOf("TOP_UP", "WINNING")) "+" else "-"
 
-    Card(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        shape = RoundedCornerShape(12.dp),
+        color = VaultGraphite
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(icon, null, tint = color, modifier = Modifier.size(36.dp))
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = color.copy(alpha = 0.1f),
+                modifier = Modifier.size(40.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
+                }
+            }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(tx.type.replaceFirstChar { it.titlecase() }, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
-                Text(tx.description ?: "", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
+                Text(tx.type.replaceFirstChar { it.titlecase() }, fontWeight = FontWeight.Medium, color = TextPrimary, fontSize = 14.sp)
+                Text(tx.description ?: "", style = MaterialTheme.typography.bodySmall, color = TextMuted, maxLines = 1)
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    "${if (tx.type in listOf("WINNING", "DEPOSIT", "REFUND")) "+" else "-"}$${String.format("%.2f", tx.amount)}",
-                    fontWeight = FontWeight.SemiBold,
-                    color = color
-                )
-                Text(tx.createdAt.safeDateShort(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f))
+                Text("$sign$${String.format("%.2f", tx.amount)}", fontWeight = FontWeight.Medium, color = color, fontSize = 14.sp)
             }
         }
     }

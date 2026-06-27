@@ -1,9 +1,8 @@
 package com.luckyvault.ui.screens.draws
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -11,14 +10,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.luckyvault.ui.components.LuckyVaultTopBar
+import com.luckyvault.ui.screens.home.StatusChip
 import com.luckyvault.ui.theme.*
-import com.luckyvault.ui.util.safeDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,195 +28,128 @@ fun DrawDetailScreen(
     onBuyTicket: (String) -> Unit,
     viewModel: DrawDetailViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(drawId) { viewModel.loadDraw(drawId) }
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
-        topBar = { LuckyVaultTopBar(title = "Draw Details", onBack = onBack) },
-        containerColor = MaterialTheme.colorScheme.background
+        topBar = { LuckyVaultTopBar(title = "Draw details", onBack = onBack) },
+        containerColor = VaultBlack
     ) { padding ->
-        when {
-            uiState.isLoading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Gold)
-                }
+        if (uiState.isLoading) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Champagne, modifier = Modifier.size(32.dp), strokeWidth = 2.dp)
             }
-            uiState.draw != null -> {
-                val draw = uiState.draw!!
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(24.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        Brush.verticalGradient(
-                                            listOf(Primary.copy(alpha = 0.2f), MaterialTheme.colorScheme.surface)
-                                        )
-                                    )
-                                    .padding(24.dp),
-                                contentAlignment = Alignment.Center
+        } else if (uiState.draw != null) {
+            val draw = uiState.draw!!
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Header
+                item {
+                    Spacer(Modifier.height(4.dp))
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        color = VaultGraphite
+                    ) {
+                        Column(modifier = Modifier.padding(24.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(draw.title, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
-                                    Spacer(Modifier.height(16.dp))
-                                    if (draw.description != null) {
-                                        Text(
-                                            draw.description,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                                        )
-                                        Spacer(Modifier.height(16.dp))
-                                    }
-                                    Text("PRIZE POOL", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
-                                    Text(
-                                        "$${String.format("%.2f", draw.prizePool)}",
-                                        fontSize = 40.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Gold
-                                    )
-                                }
+                                Text(draw.title, style = MaterialTheme.typography.headlineMedium, color = TextPrimary)
+                                StatusChip(draw.status)
                             }
-                        }
-                    }
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            StatCard("Price", "$${String.format("%.2f", draw.ticketPrice)}", Modifier.weight(1f))
-                            StatCard("Winners", "${draw.winnerCount}", Modifier.weight(1f))
-                            StatCard("Status", draw.status, Modifier.weight(1f))
-                        }
-                    }
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            StatCard("Sold", "${draw.soldTickets}", Modifier.weight(1f))
-                            StatCard("Max", "${draw.maxTickets}", Modifier.weight(1f))
-                            StatCard("Remaining", "${draw.maxTickets - draw.soldTickets}", Modifier.weight(1f))
-                        }
-                    }
-
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                        ) {
-                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Schedule, null, tint = Gold)
-                                Spacer(Modifier.width(12.dp))
-                                Column {
-                                    Text("Draw Time", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
-                                    Text(draw.scheduledAt.safeDateTime(), color = MaterialTheme.colorScheme.onSurface)
-                                }
-                            }
-                        }
-                    }
-
-                    if (draw.status == "COMPLETED" && uiState.winners.isNotEmpty()) {
-                        item {
+                            Spacer(Modifier.height(20.dp))
+                            // Prize pool - large number
+                            Text("Prize pool", style = MaterialTheme.typography.bodyMedium, color = TextMuted)
                             Text(
-                                "Winners",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(top = 8.dp)
+                                "$${String.format("%.2f", draw.prizePool)}",
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.Light,
+                                color = TextPrimary
                             )
                         }
+                    }
+                }
 
-                        items(uiState.winners) { winner ->
-                            WinnerCard(rank = winner.rank, prize = winner.prize, ticketCode = winner.ticketCode)
+                // Details card
+                item {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        color = VaultGraphite
+                    ) {
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            DetailRow("Draw time", draw.scheduledAt)
+                            Spacer(Modifier.height(12.dp))
+                            DetailRow("Ticket price", "$${String.format("%.2f", draw.ticketPrice)}")
+                            Spacer(Modifier.height(12.dp))
+                            DetailRow("Total tickets", "${draw.soldTickets}/${draw.maxTickets}")
+                            Spacer(Modifier.height(12.dp))
+                            DetailRow("Winner count", "${draw.winnerCount}")
                         }
                     }
+                }
 
-                    if (draw.status == "OPEN") {
-                        item {
-                            Spacer(Modifier.height(8.dp))
-                            Button(
-                                onClick = { onBuyTicket(draw.id) },
-                                modifier = Modifier.fillMaxWidth().height(56.dp),
-                                enabled = draw.soldTickets < draw.maxTickets,
-                                colors = ButtonDefaults.buttonColors(containerColor = Gold),
-                                shape = RoundedCornerShape(16.dp)
+                // Winners
+                if (draw.status == "COMPLETED" && !draw.winners.isNullOrEmpty()) {
+                    item {
+                        Text("Winners", style = MaterialTheme.typography.titleLarge, color = TextPrimary)
+                    }
+                    itemsIndexed(draw.winners!!) { index, winner ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            color = VaultGraphite
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Default.ConfirmationNumber, null, tint = Background)
-                                Spacer(Modifier.width(8.dp))
-                                Text("Buy Ticket", color = Background, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                                Text("#${index + 1}", fontWeight = FontWeight.Medium, color = Champagne, fontSize = 14.sp)
+                                Spacer(Modifier.width(12.dp))
+                                Column {
+                                    Text(winner.ticketCode, fontWeight = FontWeight.Medium, color = TextPrimary, fontSize = 14.sp)
+                                    if (winner.prizeAmount > 0) {
+                                        Text("$${String.format("%.2f", winner.prizeAmount)}", style = MaterialTheme.typography.bodySmall, color = Emerald)
+                                    }
+                                }
                             }
                         }
                     }
-
-                    item { Spacer(Modifier.height(16.dp)) }
                 }
+
+                // Buy button
+                if (draw.status == "OPEN") {
+                    item {
+                        Spacer(Modifier.height(4.dp))
+                        Button(
+                            onClick = { onBuyTicket(draw.id) },
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Champagne, contentColor = VaultBlack),
+                            shape = RoundedCornerShape(14.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+                        ) {
+                            Text("Buy ticket", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                        }
+                    }
+                }
+
+                item { Spacer(Modifier.height(8.dp)) }
             }
         }
     }
 }
 
 @Composable
-fun WinnerCard(rank: Int, prize: Double, ticketCode: String?) {
-    val rankIcon = when (rank) {
-        1 -> Icons.Default.EmojiEvents
-        2 -> Icons.Default.WorkspacePremium
-        3 -> Icons.Default.MilitaryTech
-        else -> Icons.Default.Star
-    }
-
-    Card(
+private fun DetailRow(label: String, value: String) {
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(rankIcon, null, tint = Gold, modifier = Modifier.size(36.dp))
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text("#$rank Winner", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-                if (ticketCode != null) {
-                    Text(ticketCode, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
-                }
-            }
-            Text(
-                "+$${String.format("%.2f", prize)}",
-                fontWeight = FontWeight.Bold,
-                color = Success,
-                fontSize = 18.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun StatCard(label: String, value: String, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(value, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.titleMedium)
-            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
-        }
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+        Text(value, fontWeight = FontWeight.Medium, color = TextPrimary)
     }
 }

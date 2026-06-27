@@ -1,119 +1,109 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { api } from '@/lib/api'
-import { formatCurrency, formatDate } from '@/lib/utils'
-import type { Draw } from '@/types'
-import { Ticket, Search } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { api, Draw } from '@/lib/api'
+import { Ticket, ArrowRight, Clock, Users, DollarSign } from 'lucide-react'
 
 export function DrawsPage() {
-  const navigate = useNavigate()
-  const [activeDraws, setActiveDraws] = useState<Draw[]>([])
-  const [completedDraws, setCompletedDraws] = useState<Draw[]>([])
+  const [draws, setDraws] = useState<Draw[]>([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'active' | 'completed'>('active')
-  const [search, setSearch] = useState('')
 
   useEffect(() => {
-    Promise.all([
-      api.getActiveDraws(),
-      api.getCompletedDraws(),
-    ]).then(([activeRes, completedRes]) => {
-      if (activeRes.success) setActiveDraws(activeRes.data)
-      if (completedRes.success) setCompletedDraws(completedRes.data.draws)
-    }).finally(() => setLoading(false))
+    api.getActiveDraws().then((res) => {
+      setDraws(res.data.draws || [])
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }, [])
-
-  const draws = tab === 'active' ? activeDraws : completedDraws
-  const filtered = draws.filter(d =>
-    d.title.toLowerCase().includes(search.toLowerCase())
-  )
-
-  if (loading) {
-    return <div className="space-y-4">{[1,2,3].map(i => <div key={i} className="h-32 shimmer rounded-3xl" />)}</div>
-  }
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Draws</h1>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search draws..."
-            className="pl-9 pr-4 py-2 glass-input text-sm text-white placeholder:text-white/20 focus:outline-none w-48"
-          />
+      <div>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)', letterSpacing: '-0.25px' }}>
+          Active draws
+        </h1>
+        <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+          Browse available draws and purchase tickets
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="vault-card p-6">
+              <div className="shimmer h-5 w-48 mb-3" />
+              <div className="shimmer h-4 w-32 mb-4" />
+              <div className="shimmer h-10 w-full" />
+            </div>
+          ))}
         </div>
-      </div>
+      ) : draws.length === 0 ? (
+        <div className="vault-card p-12 text-center">
+          <Ticket className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-disabled)' }} />
+          <p className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>No active draws</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Check back soon for new opportunities</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {draws.map((draw) => (
+            <DrawCard key={draw.id} draw={draw} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
-      <div className="flex gap-1 p-1 glass-card w-fit">
-        <button
-          onClick={() => setTab('active')}
-          className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            tab === 'active' ? 'btn-gold' : 'text-white/40 hover:text-white/70'
-          }`}
-        >
-          Active
-        </button>
-        <button
-          onClick={() => setTab('completed')}
-          className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            tab === 'completed' ? 'btn-gold' : 'text-white/40 hover:text-white/70'
-          }`}
-        >
-          Completed
-        </button>
-      </div>
+function DrawCard({ draw }: { draw: Draw }) {
+  const statusColor = draw.status === 'OPEN' ? 'var(--emerald)' : draw.status === 'UPCOMING' ? 'var(--amber)' : 'var(--text-muted)'
+  const statusBg = draw.status === 'OPEN' ? 'rgba(5, 150, 105, 0.1)' : draw.status === 'UPCOMING' ? 'rgba(217, 119, 6, 0.1)' : 'var(--vault-charcoal)'
 
-      <div className="space-y-3">
-        {filtered.length === 0 ? (
-          <div className="glass-card p-12 text-center">
-            <Ticket className="w-10 h-10 text-white/10 mx-auto mb-3" />
-            <p className="text-white/30 text-sm">No draws found</p>
+  return (
+    <div className="vault-card overflow-hidden group">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{draw.title}</h3>
+          <span
+            className="vault-badge"
+            style={{ background: statusBg, color: statusColor }}
+          >
+            {draw.status}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 mb-5">
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Prize pool</p>
+            <p className="text-lg font-medium mt-0.5" style={{ color: 'var(--text-primary)' }}>
+              ${draw.prizePool.toFixed(0)}
+            </p>
           </div>
-        ) : (
-          filtered.map((draw) => (
-            <Link
-              key={draw.id}
-              to={`/draws/${draw.id}`}
-              className="block glass-card p-5 hover:border-gold/20 transition-all duration-200 group"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-semibold text-white group-hover:text-gold transition-colors">
-                  {draw.title}
-                </h3>
-                <span className={`px-2.5 py-1 text-[10px] font-medium rounded-full border ${
-                  draw.status === 'OPEN' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                  draw.status === 'COMPLETED' ? 'bg-primary/10 text-primary-400 border-primary/20' :
-                  'bg-gold/10 text-gold border-gold/20'
-                }`}>
-                  {draw.status}
-                </span>
-              </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Ticket price</p>
+            <p className="text-lg font-medium mt-0.5" style={{ color: 'var(--text-primary)' }}>
+              ${draw.ticketPrice.toFixed(2)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Available</p>
+            <p className="text-lg font-medium mt-0.5" style={{ color: 'var(--text-primary)' }}>
+              {draw.maxTickets - draw.soldTickets}
+            </p>
+          </div>
+        </div>
 
-              <div className="grid grid-cols-4 gap-3 text-center">
-                <div>
-                  <p className="text-sm font-bold text-gold">{formatCurrency(draw.prizePool)}</p>
-                  <p className="text-[10px] text-white/30">Prize Pool</p>
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">{formatCurrency(draw.ticketPrice)}</p>
-                  <p className="text-[10px] text-white/30">Price</p>
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">{draw.soldTickets}/{draw.maxTickets}</p>
-                  <p className="text-[10px] text-white/30">Sold</p>
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">{formatDate(draw.scheduledAt)}</p>
-                  <p className="text-[10px] text-white/30">Date</p>
-                </div>
-              </div>
-            </Link>
-          ))
-        )}
+        <div className="flex gap-3">
+          <Link
+            to={`/draws/${draw.id}/buy`}
+            className="btn-primary flex-1 text-center"
+          >
+            Buy ticket
+          </Link>
+          <Link
+            to={`/draws/${draw.id}`}
+            className="btn-secondary flex-1 text-center"
+          >
+            Details
+          </Link>
+        </div>
       </div>
     </div>
   )

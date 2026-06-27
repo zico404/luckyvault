@@ -6,54 +6,130 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
+// ═══════════════════════════════════════════════════════════════
+// LUCKY VAULT — Spacing System (8pt grid)
+// ═══════════════════════════════════════════════════════════════
+object VaultSpacing {
+    val xxs: Dp = 2.dp
+    val xs: Dp = 4.dp
+    val sm: Dp = 8.dp
+    val md: Dp = 12.dp
+    val lg: Dp = 16.dp
+    val xl: Dp = 20.dp
+    val xxl: Dp = 24.dp
+    val xxxl: Dp = 32.dp
+    val huge: Dp = 40.dp
+    val massive: Dp = 48.dp
+    val giant: Dp = 64.dp
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LUCKY VAULT — Elevation / Depth
+// ═══════════════════════════════════════════════════════════════
+object VaultElevation {
+    val none: Dp = 0.dp
+    val xs: Dp = 1.dp
+    val sm: Dp = 2.dp
+    val md: Dp = 4.dp
+    val lg: Dp = 8.dp
+    val xl: Dp = 16.dp
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LUCKY VAULT — Corner Radius
+// ═══════════════════════════════════════════════════════════════
+object VaultRadius {
+    val xs: Dp = 4.dp
+    val sm: Dp = 8.dp
+    val md: Dp = 12.dp
+    val lg: Dp = 16.dp
+    val xl: Dp = 20.dp
+    val xxl: Dp = 24.dp
+    val full: Dp = 9999.dp
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Material3 Color Scheme — Dark Luxury
+// ═══════════════════════════════════════════════════════════════
 private val DarkColorScheme = darkColorScheme(
-    primary = Gold,
-    onPrimary = Background,
-    primaryContainer = GoldDark,
-    onPrimaryContainer = OnSurface,
-    secondary = GoldLight,
-    onSecondary = Background,
-    secondaryContainer = GoldMuted,
-    onSecondaryContainer = OnSurface,
-    background = Background,
-    onBackground = OnBackground,
-    surface = Surface,
-    onSurface = OnSurface,
-    surfaceVariant = SurfaceElevated,
-    onSurfaceVariant = OnBackgroundMuted,
-    error = Error,
-    onError = OnPrimary,
-    outline = Gold.copy(alpha = 0.2f),
-    surfaceTint = Gold,
-    inverseSurface = OnSurface,
-    inverseOnSurface = Background,
+    primary = Champagne,
+    onPrimary = VaultBlack,
+    primaryContainer = ChampagneMuted,
+    onPrimaryContainer = TextPrimary,
+    secondary = Platinum,
+    onSecondary = VaultBlack,
+    secondaryContainer = VaultCharcoal,
+    onSecondaryContainer = TextPrimary,
+    tertiary = Emerald,
+    onTertiary = TextPrimary,
+    background = VaultBlack,
+    onBackground = TextPrimary,
+    surface = VaultGraphite,
+    onSurface = TextPrimary,
+    surfaceVariant = VaultCharcoal,
+    onSurfaceVariant = TextSecondary,
+    surfaceTint = Champagne,
+    inverseSurface = TextPrimary,
+    inverseOnSurface = VaultBlack,
+    error = Crimson,
+    onError = TextPrimary,
+    errorContainer = CrimsonMuted,
+    onErrorContainer = Crimson,
+    outline = VaultSubtle,
+    outlineVariant = VaultSubtle,
+    scrim = Color.Black,
+    surfaceBright = VaultCharcoal,
+    surfaceDim = VaultBlack,
+    surfaceContainerLowest = VaultBlack,
+    surfaceContainerLow = VaultGraphite,
+    surfaceContainer = VaultCharcoal,
+    surfaceContainerHigh = VaultElevated,
+    surfaceContainerHighest = VaultSubtle,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = GoldDark,
-    onPrimary = OnPrimary,
-    primaryContainer = Gold,
-    onPrimaryContainer = Background,
-    secondary = Primary,
-    onSecondary = OnPrimary,
-    secondaryContainer = PrimaryLight,
-    onSecondaryContainer = Background,
-    background = Color(0xFFF5F5F0),
-    onBackground = Color(0xFF1A1A1A),
+    primary = ChampagneMuted,
+    onPrimary = TextPrimary,
+    primaryContainer = ChampagneLight,
+    onPrimaryContainer = VaultBlack,
+    secondary = Platinum,
+    onSecondary = VaultBlack,
+    background = Color(0xFFFAFAFA),
+    onBackground = VaultBlack,
     surface = Color.White,
-    onSurface = Color(0xFF1A1A1A),
-    surfaceVariant = Color(0xFFF0EDE8),
-    onSurfaceVariant = Color(0xFF666666),
-    error = ErrorLight,
-    onError = OnPrimary,
-    outline = Color(0xFFCCCCCC),
-    surfaceTint = GoldDark,
+    surfaceVariant = Color(0xFFF4F4F5),
+    onSurfaceVariant = TextMuted,
+    error = Crimson,
+    onError = TextPrimary,
+    outline = VaultSubtle,
 )
+
+@Immutable
+data class VaultColors(
+    val success: Color = Emerald,
+    val successMuted: Color = EmeraldMuted,
+    val warning: Color = Amber,
+    val warningMuted: Color = AmberMuted,
+    val champagne: Color = Champagne,
+    val champagneSubtle: Color = ChampagneSubtle,
+    val champagneMuted: Color = ChampagneMuted,
+    val platinum: Color = Platinum,
+    val vaultBlack: Color = VaultBlack,
+    val vaultGraphite: Color = VaultGraphite,
+    val vaultCharcoal: Color = VaultCharcoal,
+    val vaultElevated: Color = VaultElevated,
+    val vaultSubtle: Color = VaultSubtle,
+)
+
+val LocalVaultColors = androidx.compose.runtime.staticCompositionLocalOf { VaultColors() }
 
 @Composable
 fun LuckyVaultTheme(
@@ -77,9 +153,11 @@ fun LuckyVaultTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    androidx.compose.runtime.CompositionLocalProvider(LocalVaultColors provides VaultColors()) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
 }

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.LuckyVault" parent="android:Theme.Material.NoActionBar">
-        <item name="android:statusBarColor">#FF0A120B</item>
-        <item name="android:navigationBarColor">#FF0A120B</item>
+        <item name="android:statusBarColor">#FF09090B</item>
+        <item name="android:navigationBarColor">#FF09090B</item>
         <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
 
     <style name="Theme.LuckyVault.Splash" parent="Theme.LuckyVault">
         <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:windowSplashScreenBackground">#FF0A120B</item>
+        <item name="android:windowSplashScreenBackground">#FF09090B</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
         <item name="android:windowSplashScreenAnimationDuration">800</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">#FF0A120B</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#FF09090B</item>
     </style>
 </resources>

@@ -1,123 +1,104 @@
 import { useEffect, useState } from 'react'
-import { api } from '@/lib/api'
-import { formatCurrency, formatDateTime } from '@/lib/utils'
-import type { Wallet, Transaction } from '@/types'
-import { Wallet as WalletIcon, ArrowUpRight, ArrowDownLeft, Plus, X } from 'lucide-react'
+import { api, Transaction } from '@/lib/api'
+import { Wallet, ArrowUpRight, ArrowDownLeft, Plus, Minus, Trophy, ArrowRight } from 'lucide-react'
 
 export function WalletPage() {
-  const [wallet, setWallet] = useState<Wallet | null>(null)
+  const [balance, setBalance] = useState(0)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [showTopUp, setShowTopUp] = useState(false)
-  const [topUpAmount, setTopUpAmount] = useState('')
 
   useEffect(() => {
     Promise.all([
       api.getBalance(),
       api.getTransactions(),
-    ]).then(([walletRes, transRes]) => {
-      if (walletRes.success) setWallet(walletRes.data)
-      if (transRes.success) setTransactions(transRes.data.transactions)
-    }).finally(() => setLoading(false))
+    ]).then(([balRes, txRes]) => {
+      setBalance(balRes.data.balance || 0)
+      setTransactions(txRes.data.transactions || [])
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }, [])
-
-  if (loading) {
-    return <div className="space-y-4">{[1,2,3].map(i => <div key={i} className="h-24 shimmer rounded-3xl" />)}</div>
-  }
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-white">Wallet</h1>
+      <div>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)', letterSpacing: '-0.25px' }}>
+          Wallet
+        </h1>
+        <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+          Manage your balance and transactions
+        </p>
+      </div>
 
-      {/* Balance Card */}
-      <div className="glass-card p-6 relative overflow-hidden">
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full opacity-15 blur-3xl pointer-events-none"
-          style={{ background: 'radial-gradient(circle, hsl(45 100% 50% / 0.6) 0%, transparent 70%)' }} />
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-white/30 uppercase tracking-wider mb-1">Balance</p>
-              <p className="text-3xl font-black text-gold gold-glow">{formatCurrency(wallet?.balance ?? 0)}</p>
-            </div>
-            <button
-              onClick={() => setShowTopUp(true)}
-              className="p-3 btn-gold rounded-2xl"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+      {/* Balance card */}
+      <div className="vault-card p-6" style={{ background: 'var(--vault-graphite)' }}>
+        <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Available balance</p>
+        <p className="text-3xl font-light mt-2" style={{ color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+          ${balance.toFixed(2)}
+        </p>
+        <button
+          onClick={() => setShowTopUp(true)}
+          className="btn-primary mt-4"
+        >
+          <Plus className="w-4 h-4" /> Top up
+        </button>
       </div>
 
       {/* Transactions */}
       <div>
-        <h3 className="text-sm font-bold text-white mb-3">Recent Transactions</h3>
-        <div className="space-y-2">
-          {transactions.length === 0 ? (
-            <div className="glass-card p-8 text-center">
-              <WalletIcon className="w-8 h-8 text-white/10 mx-auto mb-2" />
-              <p className="text-white/30 text-sm">No transactions yet</p>
-            </div>
-          ) : (
-            transactions.map((tx) => (
-              <div key={tx.id} className="glass-card p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 glass-card flex items-center justify-center rounded-xl ${
-                    tx.type === 'DEPOSIT' || tx.type === 'WINNING' ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    {tx.type === 'DEPOSIT' || tx.type === 'WINNING' ? (
-                      <ArrowDownLeft className="w-4 h-4" />
-                    ) : (
-                      <ArrowUpRight className="w-4 h-4" />
+        <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Transactions</h2>
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="vault-card p-4"><div className="shimmer h-12 w-full" /></div>
+            ))}
+          </div>
+        ) : transactions.length === 0 ? (
+          <div className="vault-card p-8 text-center">
+            <Wallet className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--text-disabled)' }} />
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No transactions yet</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {transactions.map((tx) => {
+              const isCredit = tx.type === 'TOP_UP' || tx.type === 'WINNING'
+              const Icon = isCredit ? ArrowDownLeft : tx.type === 'PURCHASE' ? Minus : ArrowUpRight
+              const color = isCredit ? 'var(--emerald)' : 'var(--crimson)'
+              return (
+                <div key={tx.id} className="vault-card p-4 flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: isCredit ? 'rgba(5,150,105,0.1)' : 'rgba(220,38,38,0.1)' }}
+                  >
+                    <Icon className="w-4 h-4" style={{ color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                      {tx.type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                    </p>
+                    {tx.description && (
+                      <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>{tx.description}</p>
                     )}
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">{tx.type}</p>
-                    <p className="text-[10px] text-white/30">{formatDateTime(tx.createdAt)}</p>
-                  </div>
+                  <p className="text-sm font-medium shrink-0" style={{ color }}>
+                    {isCredit ? '+' : '-'}${tx.amount.toFixed(2)}
+                  </p>
                 </div>
-                <p className={`text-sm font-bold ${
-                  tx.type === 'DEPOSIT' || tx.type === 'WINNING' ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  {tx.type === 'DEPOSIT' || tx.type === 'WINNING' ? '+' : '-'}{formatCurrency(tx.amount)}
-                </p>
-              </div>
-            ))
-          )}
-        </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Top Up Modal */}
+      {/* Top up modal */}
       {showTopUp && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setShowTopUp(false)}
-        >
-          <div className="glass-card p-6 max-w-sm w-full animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">Top Up Wallet</h3>
-              <button onClick={() => setShowTopUp(false)} className="text-white/30 hover:text-white/60">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-3">
-              <input
-                type="number"
-                value={topUpAmount}
-                onChange={(e) => setTopUpAmount(e.target.value)}
-                placeholder="Enter amount"
-                className="w-full px-4 py-3 glass-input text-white placeholder:text-white/20 focus:outline-none text-sm"
-                min="1"
-              />
-              <button
-                className="w-full py-3 btn-gold text-sm"
-                onClick={() => {
-                  setShowTopUp(false)
-                  setTopUpAmount('')
-                }}
-              >
-                Confirm Top Up
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)' }}>
+          <div className="vault-card p-6 w-full max-w-sm animate-scale-in">
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Top up wallet</h3>
+            <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Select an amount to add to your wallet.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowTopUp(false)} className="btn-secondary flex-1">Cancel</button>
+              <button onClick={() => setShowTopUp(false)} className="btn-primary flex-1">Confirm</button>
             </div>
           </div>
         </div>

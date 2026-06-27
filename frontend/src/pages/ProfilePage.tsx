@@ -1,21 +1,24 @@
-import { useAuth } from '@/lib/auth'
-import { useNavigate } from 'react-router-dom'
-import { formatCurrency } from '@/lib/utils'
-import { api } from '@/lib/api'
 import { useEffect, useState } from 'react'
-import type { Wallet } from '@/types'
-import { User, Mail, Wallet as WalletIcon, BadgeCheck, LogOut, X } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
+import { api, User, Wallet as WalletType } from '@/lib/api'
+import { User as UserIcon, Mail, Wallet, Badge, LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 export function ProfilePage() {
-  const { user, logout } = useAuth()
+  const { user: authUser, logout } = useAuth()
   const navigate = useNavigate()
-  const [wallet, setWallet] = useState<Wallet | null>(null)
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [wallet, setWallet] = useState<WalletType | null>(null)
+  const [showLogout, setShowLogout] = useState(false)
 
   useEffect(() => {
-    api.getBalance().then((res) => {
-      if (res.success) setWallet(res.data)
-    })
+    Promise.all([
+      api.getProfile(),
+      api.getBalance(),
+    ]).then(([profRes, balRes]) => {
+      setUser(profRes.data)
+      setWallet(balRes.data)
+    }).catch(() => {})
   }, [])
 
   const handleLogout = async () => {
@@ -23,80 +26,71 @@ export function ProfilePage() {
     navigate('/auth')
   }
 
-  const infoItems = [
-    { icon: User, label: 'Name', value: user?.displayName || 'Not set' },
-    { icon: Mail, label: 'Email', value: user?.email || 'Not set' },
-    { icon: WalletIcon, label: 'Balance', value: formatCurrency(wallet?.balance ?? 0) },
-    { icon: BadgeCheck, label: 'Role', value: user?.role || 'USER' },
-  ]
-
   return (
-    <div className="space-y-6 animate-fade-in max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold text-white">Profile</h1>
+    <div className="space-y-6 animate-fade-in max-w-[480px] mx-auto">
+      <div>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)', letterSpacing: '-0.25px' }}>
+          Profile
+        </h1>
+      </div>
 
-      {/* Avatar */}
-      <div className="glass-card p-6 flex flex-col items-center">
-        <div className="relative mb-4">
-          <div className="absolute inset-0 rounded-full blur-xl opacity-30"
-            style={{ background: 'radial-gradient(circle, hsl(45 100% 50% / 0.5) 0%, transparent 70%)' }} />
-          <div className="w-20 h-20 glass-card rounded-full flex items-center justify-center relative z-10">
-            <span className="text-2xl font-black text-gold">
-              {(user?.displayName || user?.email || '?')[0].toUpperCase()}
-            </span>
-          </div>
+      {/* Avatar + name */}
+      <div className="flex flex-col items-center">
+        <div
+          className="w-20 h-20 rounded-full flex items-center justify-center"
+          style={{ background: 'var(--vault-charcoal)' }}
+        >
+          <span className="text-2xl font-semibold" style={{ color: 'var(--champagne)' }}>
+            {(user?.displayName || user?.email || '?')[0].toUpperCase()}
+          </span>
         </div>
-        <h2 className="text-lg font-bold text-white">{user?.displayName || 'User'}</h2>
-        <p className="text-xs text-white/30">{user?.email}</p>
+        <h2 className="text-lg font-semibold mt-4" style={{ color: 'var(--text-primary)' }}>
+          {user?.displayName || 'User'}
+        </h2>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+          {user?.email || authUser?.email}
+        </p>
       </div>
 
-      {/* Info */}
-      <div className="space-y-2">
-        {infoItems.map((item) => (
-          <div key={item.label} className="glass-card p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <item.icon className="w-4 h-4 text-gold" />
-              <span className="text-xs text-white/40">{item.label}</span>
-            </div>
-            <span className="text-sm font-medium text-white">{item.value}</span>
-          </div>
-        ))}
+      {/* Info card */}
+      <div className="vault-card p-5 space-y-0">
+        <ProfileRow icon={<UserIcon className="w-4 h-4" />} label="Name" value={user?.displayName || 'Not set'} />
+        <Divider />
+        <ProfileRow icon={<Mail className="w-4 h-4" />} label="Email" value={user?.email || 'Not set'} />
+        <Divider />
+        <ProfileRow icon={<Wallet className="w-4 h-4" />} label="Balance" value={`$${(wallet?.balance || 0).toFixed(2)}`} />
+        <Divider />
+        <ProfileRow icon={<Badge className="w-4 h-4" />} label="Role" value={user?.role || 'USER'} />
       </div>
 
-      {/* Logout */}
+      {/* Sign out */}
       <button
-        onClick={() => setShowLogoutConfirm(true)}
-        className="w-full py-3.5 glass-card text-destructive text-sm font-medium flex items-center justify-center gap-2 hover:bg-destructive/10 transition-colors"
+        onClick={() => setShowLogout(true)}
+        className="w-full h-11 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
+        style={{
+          background: 'transparent',
+          border: '1px solid rgba(220, 38, 38, 0.2)',
+          color: 'var(--crimson)',
+        }}
       >
         <LogOut className="w-4 h-4" />
-        Sign Out
+        Sign out
       </button>
 
-      {/* Logout Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setShowLogoutConfirm(false)}
-        >
-          <div className="glass-card p-6 max-w-sm w-full animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">Sign Out</h3>
-              <button onClick={() => setShowLogoutConfirm(false)} className="text-white/30 hover:text-white/60">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <p className="text-sm text-white/40 mb-6">Are you sure you want to sign out?</p>
+      {/* Logout confirmation */}
+      {showLogout && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)' }}>
+          <div className="vault-card p-6 w-full max-w-sm animate-scale-in">
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Sign out</h3>
+            <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Are you sure you want to sign out?</p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setShowLogoutConfirm(false)}
-                className="flex-1 py-2.5 glass-card text-white/60 text-sm font-medium hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
+              <button onClick={() => setShowLogout(false)} className="btn-secondary flex-1">Cancel</button>
               <button
                 onClick={handleLogout}
-                className="flex-1 py-2.5 bg-destructive text-white text-sm font-medium rounded-2xl hover:bg-destructive/90 transition-colors"
+                className="flex-1 h-10 rounded-lg text-sm font-medium"
+                style={{ background: 'var(--crimson)', color: 'white' }}
               >
-                Sign Out
+                Sign out
               </button>
             </div>
           </div>
@@ -104,4 +98,20 @@ export function ProfilePage() {
       )}
     </div>
   )
+}
+
+function ProfileRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <span style={{ color: 'var(--text-muted)' }}>{icon}</span>
+      <div className="flex-1">
+        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
+        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{value}</p>
+      </div>
+    </div>
+  )
+}
+
+function Divider() {
+  return <div className="h-px" style={{ background: 'var(--vault-subtle)' }} />
 }

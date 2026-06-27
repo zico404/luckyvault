@@ -2,92 +2,38 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="120"
-    android:viewportHeight="120">
+    android:viewportWidth="100"
+    android:viewportHeight="100">
 
-    <!-- Dark base circle -->
-    <path
-        android:fillColor="#0A120B"
-        android:pathData="M60,60m-56,0a56,56 0,1 1,112 0a56,56 0,1 1,-112 0" />
-
-    <!-- Gold ring -->
-    <path
-        android:strokeColor="#C9A84C"
-        android:strokeWidth="5.0"
-        android:fillColor="#00000000"
-        android:pathData="M60,60m-52,0a52,52 0,1 1,104 0a52,52 0,1 1,-104 0" />
-
-    <!-- Inner ring detail -->
-    <path
-        android:strokeColor="#C9A84C"
-        android:strokeWidth="0.8"
-        android:fillColor="#00000000"
-        android:pathData="M60,60m-47,0a47,47 0,1 1,94 0a47,47 0,1 1,-94 0"
-        android:strokeAlpha="0.4" />
-
-    <!-- Cardinal tick marks (12, 3, 6, 9) - bright gold -->
-    <path android:strokeColor="#FFE88A" android:strokeWidth="2.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M60,13L60,22" />
-    <path android:strokeColor="#FFE88A" android:strokeWidth="2.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M107,60L98,60" />
-    <path android:strokeColor="#FFE88A" android:strokeWidth="2.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M60,107L60,98" />
-    <path android:strokeColor="#FFE88A" android:strokeWidth="2.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M13,60L22,60" />
-
-    <!-- Diagonal tick marks - dimmer gold -->
-    <path android:strokeColor="#C9A84C" android:strokeWidth="1.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M27,27L33,33"
-        android:strokeAlpha="0.6" />
-    <path android:strokeColor="#C9A84C" android:strokeWidth="1.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M87,27L93,33"
-        android:strokeAlpha="0.6" />
-    <path android:strokeColor="#C9A84C" android:strokeWidth="1.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M27,87L33,93"
-        android:strokeAlpha="0.6" />
-    <path android:strokeColor="#C9A84C" android:strokeWidth="1.5" android:strokeLineCap="round" android:fillColor="#00000000"
-        android:pathData="M87,87L93,93"
-        android:strokeAlpha="0.6" />
-
-    <!-- Center knob outer ring -->
+    <!-- Octagon — outer shell -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#A08030"
-        android:strokeWidth="1.5"
-        android:pathData="M60,60m-16,0a16,16 0,1 1,32 0a16,16 0,1 1,-32 0" />
+        android:strokeColor="#C9A962"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round"
+        android:pathData="M50,4 L78.5,14.3 L95.7,37.5 L95.7,62.5 L78.5,85.7 L50,96 L21.5,85.7 L4.3,62.5 L4.3,37.5 L21.5,14.3 Z" />
 
-    <!-- Center knob gold -->
+    <!-- Inner facets — 8 lines from center to vertices -->
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L50,4" android:strokeAlpha="0.2" />
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L78.5,14.3" android:strokeAlpha="0.2" />
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L95.7,37.5" android:strokeAlpha="0.2" />
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L95.7,62.5" android:strokeAlpha="0.2" />
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L50,96" android:strokeAlpha="0.2" />
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L21.5,85.7" android:strokeAlpha="0.2" />
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L4.3,62.5" android:strokeAlpha="0.2" />
+    <path android:fillColor="#00000000" android:strokeColor="#C9A962" android:strokeWidth="0.6" android:pathData="M50,50L21.5,14.3" android:strokeAlpha="0.2" />
+
+    <!-- Center diamond — the keyhole -->
     <path
-        android:fillColor="#C9A84C"
-        android:pathData="M60,60m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0" />
+        android:fillColor="#C9A962"
+        android:pathData="M50,42 L58,50 L50,58 L42,50 Z" />
 
-    <!-- Knob inner ring -->
+    <!-- Subtle inner ring -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#A08030"
-        android:strokeWidth="0.8"
-        android:pathData="M60,60m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"
-        android:strokeAlpha="0.5" />
-
-    <!-- Center dot -->
-    <path
-        android:fillColor="#0D1B0E"
-        android:pathData="M60,60m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
-
-    <!-- Handle bar -->
-    <path
-        android:strokeColor="#FFE88A"
-        android:strokeWidth="3.0"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M60,46L60,74" />
-
-    <!-- Handle endpoints -->
-    <path
-        android:fillColor="#FFE88A"
-        android:pathData="M60,46m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
-    <path
-        android:fillColor="#FFE88A"
-        android:pathData="M60,74m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
+        android:strokeColor="#C9A962"
+        android:strokeWidth="0.5"
+        android:pathData="M50,50m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0"
+        android:strokeAlpha="0.25" />
 
 </vector>

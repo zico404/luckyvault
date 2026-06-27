@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,79 +31,83 @@ fun ProfileScreen(
 
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Profile", onBack = onBack) },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = VaultBlack
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(24.dp),
+                .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Premium Avatar
-            Box(
-                modifier = Modifier
-                    .size(88.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.linearGradient(listOf(GoldDark, Gold, GoldLight))
-                    ),
-                contentAlignment = Alignment.Center
+            Spacer(Modifier.height(24.dp))
+
+            // Avatar
+            Surface(
+                modifier = Modifier.size(72.dp),
+                shape = CircleShape,
+                color = VaultCharcoal
             ) {
-                Text(
-                    (uiState.user?.displayName ?: uiState.user?.email ?: "?").first().uppercase(),
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = OnPrimary
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        (uiState.user?.displayName ?: uiState.user?.email ?: "?").first().uppercase(),
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Champagne
+                    )
+                }
             }
 
             Spacer(Modifier.height(16.dp))
-            Text(uiState.user?.displayName ?: "User", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            Text(uiState.user?.email ?: "", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f))
+            Text(uiState.user?.displayName ?: "User", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+            Spacer(Modifier.height(4.dp))
+            Text(uiState.user?.email ?: "", style = MaterialTheme.typography.bodyMedium, color = TextMuted)
 
             Spacer(Modifier.height(32.dp))
 
-            Card(
+            // Info card
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                shape = RoundedCornerShape(16.dp),
+                color = VaultGraphite
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    ProfileInfoRow(Icons.Default.Person, "Name", uiState.user?.displayName ?: "Not set")
-                    Divider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
-                    ProfileInfoRow(Icons.Default.Email, "Email", uiState.user?.email ?: "Not set")
-                    Divider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
-                    ProfileInfoRow(Icons.Default.AccountBalanceWallet, "Balance", "$${String.format("%.2f", uiState.wallet?.balance ?: 0.0)}")
-                    Divider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
-                    ProfileInfoRow(Icons.Default.Badge, "Role", uiState.user?.role ?: "USER")
+                    ProfileInfoRow(Icons.Default.PersonOutline, "Name", uiState.user?.displayName ?: "Not set")
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
+                    ProfileInfoRow(Icons.Default.MailOutline, "Email", uiState.user?.email ?: "Not set")
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
+                    ProfileInfoRow(Icons.Default.account_balance_wallet, "Balance", "$${String.format("%.2f", uiState.wallet?.balance ?: 0.0)}")
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
+                    ProfileInfoRow(Icons.Default.badge, "Role", uiState.user?.role ?: "USER")
                 }
             }
 
             Spacer(Modifier.weight(1f))
 
-            Button(
+            // Sign out
+            OutlinedButton(
                 onClick = { showLogoutConfirm = true },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                shape = RoundedCornerShape(16.dp)
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Crimson),
+                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                    brush = androidx.compose.ui.graphics.SolidColor(Crimson.copy(alpha = 0.3f))
+                )
             ) {
-                Icon(Icons.Default.Logout, null)
+                Icon(Icons.Default.logout, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Sign Out", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                Text("Sign out", fontWeight = FontWeight.Medium, fontSize = 14.sp)
             }
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 
     if (showLogoutConfirm) {
         AlertDialog(
             onDismissRequest = { showLogoutConfirm = false },
-            title = {
-                Text("Sign Out", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            },
-            text = {
-                Text("Are you sure you want to sign out?", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f))
-            },
+            title = { Text("Sign out", fontWeight = FontWeight.SemiBold) },
+            text = { Text("Are you sure you want to sign out?", color = TextSecondary) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -112,30 +115,31 @@ fun ProfileScreen(
                         viewModel.logout()
                         onLogout()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Sign Out")
-                }
+                    colors = ButtonDefaults.buttonColors(containerColor = Crimson, contentColor = TextPrimary),
+                    shape = RoundedCornerShape(10.dp)
+                ) { Text("Sign out") }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutConfirm = false }) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.onSurface)
+                    Text("Cancel", color = TextSecondary)
                 }
             },
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = VaultGraphite,
+            titleContentColor = TextPrimary,
+            shape = RoundedCornerShape(20.dp)
         )
     }
 }
 
 @Composable
-fun ProfileInfoRow(icon: ImageVector, label: String, value: String) {
+private fun ProfileInfoRow(icon: ImageVector, label: String, value: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, null, tint = Gold, modifier = Modifier.size(20.dp))
+        Icon(icon, null, tint = TextMuted, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(12.dp))
         Column {
-            Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f))
-            Text(value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
+            Text(label, style = MaterialTheme.typography.labelSmall, color = TextMuted)
+            Spacer(Modifier.height(2.dp))
+            Text(value, color = TextPrimary, fontWeight = FontWeight.Medium, fontSize = 14.sp)
         }
     }
 }

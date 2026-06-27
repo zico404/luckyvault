@@ -16,8 +16,8 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ defaul
 
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--vault-black)' }}>
+      <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--vault-subtle)', borderTopColor: 'var(--champagne)' }} />
     </div>
   )
 }
@@ -60,12 +60,12 @@ export default function App() {
           <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="*" element={
-            <div className="min-h-screen bg-background flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <h1 className="text-6xl font-black text-gold">404</h1>
-                <p className="text-muted-foreground">Page not found</p>
-                <a href="/" className="inline-block px-6 py-2 bg-gold text-background rounded-xl font-medium hover:bg-gold/90 transition-colors">
-                  Go Home
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--vault-black)' }}>
+              <div className="text-center space-y-4 animate-fade-in">
+                <p className="text-6xl font-light" style={{ color: 'var(--champagne)', letterSpacing: '-2px' }}>404</p>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Page not found</p>
+                <a href="/" className="btn-primary inline-flex mt-4">
+                  Go home
                 </a>
               </div>
             </div>

@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.geometry.Offset
@@ -34,136 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.luckyvault.ui.components.VaultMark
 import com.luckyvault.ui.theme.*
 
-@Composable
-fun VaultLogo(
-    modifier: Modifier = Modifier,
-    size: Int = 80
-) {
-    Box(
-        modifier = modifier.size(size.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        // Outer glow
-        Box(
-            modifier = Modifier
-                .size((size * 1.6).dp)
-                .drawBehind {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                Gold.copy(alpha = 0.25f),
-                                Color.Transparent
-                            ),
-                            radius = this.size.minDimension / 2
-                        )
-                    )
-                }
-        )
-
-        // Vault dial SVG rendered as Compose Canvas
-        androidx.compose.foundation.Canvas(
-            modifier = Modifier.size(size.dp)
-        ) {
-            val cx = this.size.width / 2
-            val cy = this.size.height / 2
-            val outerRadius = this.size.minDimension / 2 * 0.95f
-            val ringWidth = outerRadius * 0.08f
-
-            // Dark base
-            drawCircle(
-                color = Color(0xFF0A120B),
-                radius = outerRadius
-            )
-
-            // Gold ring
-            drawCircle(
-                color = Gold,
-                radius = outerRadius,
-                style = androidx.compose.ui.graphics.drawscope.Stroke(width = ringWidth)
-            )
-
-            // Inner ring
-            drawCircle(
-                color = Gold.copy(alpha = 0.3f),
-                radius = outerRadius * 0.88f,
-                style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1f)
-            )
-
-            // Tick marks
-            for (i in 0 until 12) {
-                val angle = Math.toRadians((i * 30 - 90).toDouble())
-                val isCardinal = i % 3 == 0
-                val innerR = if (isCardinal) outerRadius * 0.72f else outerRadius * 0.78f
-                val outerR = outerRadius * 0.88f
-
-                drawLine(
-                    color = if (isCardinal) GoldBright else Gold.copy(alpha = 0.6f),
-                    start = Offset(
-                        cx + innerR * kotlin.math.cos(angle).toFloat(),
-                        cy + innerR * kotlin.math.sin(angle).toFloat()
-                    ),
-                    end = Offset(
-                        cx + outerR * kotlin.math.cos(angle).toFloat(),
-                        cy + outerR * kotlin.math.sin(angle).toFloat()
-                    ),
-                    strokeWidth = if (isCardinal) 3f else 1.5f,
-                    cap = androidx.compose.ui.graphics.StrokeCap.Round
-                )
-            }
-
-            // Center knob ring
-            drawCircle(
-                color = GoldDark,
-                radius = outerRadius * 0.28f,
-                style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2f)
-            )
-
-            // Center knob
-            drawCircle(
-                color = Gold,
-                radius = outerRadius * 0.24f
-            )
-
-            // Knob inner ring
-            drawCircle(
-                color = GoldDark.copy(alpha = 0.5f),
-                radius = outerRadius * 0.17f,
-                style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1f)
-            )
-
-            // Center dot
-            drawCircle(
-                color = Color(0xFF0D1B0E),
-                radius = outerRadius * 0.07f
-            )
-
-            // Handle bar
-            drawLine(
-                color = GoldBright,
-                start = Offset(cx, cy - outerRadius * 0.28f),
-                end = Offset(cx, cy + outerRadius * 0.28f),
-                strokeWidth = 4f,
-                cap = androidx.compose.ui.graphics.StrokeCap.Round
-            )
-
-            // Handle endpoints
-            drawCircle(
-                color = GoldBright,
-                radius = 3f,
-                center = Offset(cx, cy - outerRadius * 0.28f)
-            )
-            drawCircle(
-                color = GoldBright,
-                radius = 3f,
-                center = Offset(cx, cy + outerRadius * 0.28f)
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthScreen(
     onNavigateToHome: () -> Unit,
@@ -177,16 +49,25 @@ fun AuthScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    // Logo float animation
-    val infiniteTransition = rememberInfiniteTransition(label = "logo_float")
-    val logoOffset by infiniteTransition.animateFloat(
+    // Subtle logo entrance animation
+    val infiniteTransition = rememberInfiniteTransition(label = "entrance")
+    val logoAlpha by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 6f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(3000, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
+            animation = tween(1200, easing = EaseOutCubic),
+            repeatMode = RepeatMode.Once
         ),
-        label = "logo_offset"
+        label = "logo_alpha"
+    )
+    val logoScale by infiniteTransition.animateFloat(
+        initialValue = 0.85f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = EaseOutCubic),
+            repeatMode = RepeatMode.Once
+        ),
+        label = "logo_scale"
     )
 
     LaunchedEffect(uiState.isRegistered) {
@@ -196,141 +77,109 @@ fun AuthScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(VaultBlack)
     ) {
-        // Ambient glow effects
-        Box(
-            modifier = Modifier
-                .size(400.dp)
-                .offset(x = (-100).dp, y = (-150).dp)
-                .blur(120.dp)
-                .drawBehind {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Gold.copy(alpha = 0.12f), Color.Transparent)
-                        )
-                    )
-                }
-        )
-        Box(
-            modifier = Modifier
-                .size(350.dp)
-                .offset(x = 200.dp, y = 600.dp)
-                .blur(100.dp)
-                .drawBehind {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Primary.copy(alpha = 0.15f), Color.Transparent)
-                        )
-                    )
-                }
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Glassmorphic card
+            Spacer(Modifier.height(0.dp))
+
+            // Top spacer for vertical centering feel
+            Spacer(Modifier.weight(0.3f))
+
+            // Logo mark
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .drawBehind {
-                        // Card background with glass effect
-                        drawRect(
-                            color = Color(0x1A162418)
+                    .size(72.dp)
+                    .graphicsLayer {
+                        alpha = logoAlpha
+                        scaleX = logoScale
+                        scaleY = logoScale
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                VaultMark(size = 72)
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // Brand name
+            Text(
+                text = "LUCKY VAULT",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 4.sp,
+                color = TextPrimary
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            // Tagline
+            Text(
+                text = if (isLoginMode) "Welcome back" else "Create your account",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextMuted,
+                letterSpacing = 0.5.sp
+            )
+
+            Spacer(Modifier.height(48.dp))
+
+            // ── Form Card ──
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = VaultGraphite.copy(alpha = 0.8f),
+                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Champagne.copy(alpha = 0.08f),
+                            Color.Transparent,
+                            Champagne.copy(alpha = 0.04f)
                         )
-                        // Subtle gold border glow
-                        drawRect(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    Gold.copy(alpha = 0.15f),
-                                    Color.Transparent,
-                                    Gold.copy(alpha = 0.1f)
-                                )
-                            ),
-                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1f)
-                        )
-                    }
-                    .clip(RoundedCornerShape(28.dp))
+                    )
+                )
             ) {
                 Column(
-                    modifier = Modifier.padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Floating vault logo
-                    Box(
-                        modifier = Modifier
-                            .offset(y = logoOffset.dp)
-                    ) {
-                        VaultLogo(size = 88)
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // App name with gradient
-                    Text(
-                        text = "LUCKY VAULT",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 4.sp,
-                        brush = Brush.linearGradient(
-                            colors = listOf(GoldBright, Gold, GoldDark)
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = if (isLoginMode) "Welcome back" else "Create your account",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = OnBackgroundMuted,
-                        letterSpacing = 1.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(36.dp))
-
-                    // Email field
-                    GlassTextField(
+                    // Email
+                    VaultTextField(
                         value = email,
                         onValueChange = { email = it },
                         label = "Email",
-                        icon = Icons.Default.Email,
+                        icon = Icons.Default.MailOutline,
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next,
                         onNext = { focusManager.moveFocus(FocusDirection.Down) }
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // Display Name (signup only)
+                    // Display name (signup only)
                     AnimatedVisibility(
                         visible = !isLoginMode,
                         enter = fadeIn() + expandVertically(),
                         exit = fadeOut() + shrinkVertically()
                     ) {
-                        Column {
-                            GlassTextField(
-                                value = displayName,
-                                onValueChange = { displayName = it },
-                                label = "Display Name",
-                                icon = Icons.Default.Person,
-                                imeAction = ImeAction.Next,
-                                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                            )
-                            Spacer(modifier = Modifier.height(14.dp))
-                        }
+                        VaultTextField(
+                            value = displayName,
+                            onValueChange = { displayName = it },
+                            label = "Display name",
+                            icon = Icons.Default.PersonOutline,
+                            imeAction = ImeAction.Next,
+                            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                        )
                     }
 
-                    // Password field
-                    GlassTextField(
+                    // Password
+                    VaultTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = "Password",
-                        icon = Icons.Default.Lock,
+                        icon = Icons.Default.LockOutline,
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done,
                         isPassword = true,
@@ -342,106 +191,84 @@ fun AuthScreen(
                             else viewModel.register(email, password, displayName.ifBlank { null })
                         }
                     )
+                }
+            }
 
-                    // Error message
-                    AnimatedVisibility(visible = uiState.error != null) {
-                        Text(
-                            text = uiState.error ?: "",
-                            color = Error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 12.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
+            // Error
+            AnimatedVisibility(visible = uiState.error != null) {
+                Text(
+                    text = uiState.error ?: "",
+                    color = Crimson,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 12.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
 
-                    Spacer(modifier = Modifier.height(28.dp))
+            Spacer(Modifier.height(24.dp))
 
-                    // Sign In / Create Account button
-                    Button(
-                        onClick = {
-                            if (isLoginMode) viewModel.login(email, password)
-                            else viewModel.register(email, password, displayName.ifBlank { null })
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        enabled = !uiState.isLoading && email.isNotBlank() && password.length >= 8,
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent
-                        ),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    brush = Brush.horizontalGradient(
-                                        colors = if (uiState.isLoading || email.isBlank() || password.length < 8)
-                                            listOf(GoldDark.copy(alpha = 0.4f), GoldMuted.copy(alpha = 0.4f))
-                                        else listOf(GoldLight, Gold, GoldDark)
-                                    ),
-                                    shape = RoundedCornerShape(16.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (uiState.isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = Background,
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Text(
-                                    text = if (isLoginMode) "SIGN IN" else "CREATE ACCOUNT",
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 2.sp,
-                                    color = Background
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Divider
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color.Transparent,
-                                        Gold.copy(alpha = 0.2f),
-                                        Color.Transparent
-                                    )
-                                )
-                            )
+            // ── Primary Button ──
+            Button(
+                onClick = {
+                    if (isLoginMode) viewModel.login(email, password)
+                    else viewModel.register(email, password, displayName.ifBlank { null })
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                enabled = !uiState.isLoading && email.isNotBlank() && password.length >= 8,
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Champagne,
+                    disabledContainerColor = VaultCharcoal,
+                    contentColor = VaultBlack,
+                    disabledContentColor = TextDisabled
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp
+                )
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = if (email.isNotBlank() && password.length >= 8) VaultBlack else TextDisabled,
+                        strokeWidth = 2.dp
                     )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Toggle login/signup
+                } else {
                     Text(
-                        text = if (isLoginMode) "Don't have an account? Sign up" else "Already have an account? Sign in",
-                        color = Gold.copy(alpha = 0.6f),
-                        modifier = Modifier.clickable {
-                            isLoginMode = !isLoginMode
-                            viewModel.clearError()
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        letterSpacing = 0.5.sp
+                        text = if (isLoginMode) "Sign in" else "Create account",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 15.sp,
+                        letterSpacing = 0.3.sp
                     )
                 }
             }
+
+            Spacer(Modifier.height(20.dp))
+
+            // Toggle
+            Text(
+                text = buildString {
+                    append(if (isLoginMode) "New here? " else "Already have an account? ")
+                    append(if (isLoginMode) "Create an account" else "Sign in")
+                },
+                color = TextMuted,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.clickable {
+                    isLoginMode = !isLoginMode
+                    viewModel.clearError()
+                }
+            )
+
+            // Bottom spacer
+            Spacer(Modifier.weight(0.5f))
         }
     }
 }
 
 @Composable
-fun GlassTextField(
+private fun VaultTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -457,49 +284,39 @@ fun GlassTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = OnBackgroundMuted) },
+        label = { Text(label) },
         leadingIcon = {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = Gold.copy(alpha = 0.5f),
-                modifier = Modifier.size(20.dp)
-            )
+            Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
         },
         trailingIcon = if (isPassword) {
             {
-                IconButton(onClick = { onTogglePassword?.invoke() }) {
+                IconButton(onClick = { onTogglePassword?.invoke() }, modifier = Modifier.size(20.dp)) {
                     Icon(
-                        if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                         contentDescription = "Toggle password",
-                        tint = Gold.copy(alpha = 0.4f),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
         } else null,
         visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType,
-            imeAction = imeAction
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = { onNext?.invoke() },
-            onDone = { onDone?.invoke() }
-        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+        keyboardActions = KeyboardActions(onNext = { onNext?.invoke() }, onDone = { onDone?.invoke() }),
         singleLine = true,
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Gold.copy(alpha = 0.5f),
-            unfocusedBorderColor = Gold.copy(alpha = 0.12f),
-            focusedContainerColor = Background.copy(alpha = 0.6f),
-            unfocusedContainerColor = Background.copy(alpha = 0.4f),
-            focusedTextColor = OnSurface,
-            unfocusedTextColor = OnSurface,
-            cursorColor = Gold,
-            focusedLeadingIconColor = Gold.copy(alpha = 0.7f),
-            unfocusedLeadingIconColor = Gold.copy(alpha = 0.35f)
+            focusedBorderColor = Champagne.copy(alpha = 0.4f),
+            unfocusedBorderColor = VaultSubtle,
+            focusedContainerColor = VaultCharcoal.copy(alpha = 0.5f),
+            unfocusedContainerColor = VaultCharcoal.copy(alpha = 0.3f),
+            focusedTextColor = TextPrimary,
+            unfocusedTextColor = TextPrimary,
+            cursorColor = Champagne,
+            focusedLeadingIconColor = Champagne.copy(alpha = 0.7f),
+            unfocusedLeadingIconColor = TextMuted,
+            focusedLabelColor = Champagne.copy(alpha = 0.7f),
+            unfocusedLabelColor = TextMuted
         )
     )
 }
