@@ -11,6 +11,7 @@ export function ProfilePage() {
   const [wallet, setWallet] = useState<WalletType | null>(null)
   const [loading, setLoading] = useState(true)
   const [showLogout, setShowLogout] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -23,6 +24,7 @@ export function ProfilePage() {
   }, [])
 
   const handleLogout = async () => {
+    setLoggingOut(true)
     await logout()
     navigate('/auth')
   }
@@ -103,12 +105,14 @@ export function ProfilePage() {
             <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Sign out</h3>
             <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Are you sure you want to sign out?</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowLogout(false)} className="btn-secondary flex-1">Cancel</button>
+              <button onClick={() => setShowLogout(false)} className="btn-secondary flex-1" disabled={loggingOut}>Cancel</button>
               <button
                 onClick={handleLogout}
-                className="flex-1 h-10 rounded-lg text-sm font-medium"
-                style={{ background: 'var(--crimson)', color: 'white' }}
+                disabled={loggingOut}
+                className="flex-1 h-10 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
+                style={{ background: 'var(--crimson)', color: 'white', opacity: loggingOut ? 0.7 : 1 }}
               >
+                {loggingOut && <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
                 Sign out
               </button>
             </div>
