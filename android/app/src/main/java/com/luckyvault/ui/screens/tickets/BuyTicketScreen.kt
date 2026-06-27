@@ -29,8 +29,8 @@ fun BuyTicketScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(uiState.isPurchased) {
-        if (uiState.isPurchased) onTicketPurchased()
+    LaunchedEffect(uiState.success) {
+        if (uiState.success) onTicketPurchased()
     }
 
     Scaffold(

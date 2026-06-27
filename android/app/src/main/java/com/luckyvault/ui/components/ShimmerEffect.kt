@@ -4,6 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -37,42 +38,34 @@ fun ShimmerCard() {
                     .fillMaxWidth(0.6f)
                     .height(16.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(VaultCharcoal, VaultElevated, VaultCharcoal),
-                            start = Offset(shimmerX, 0f),
-                            end = Offset(shimmerX + 150f, 0f)
-                        )
-                    )
+                    .shimmerBrush(shimmerX)
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.4f)
                     .height(12.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(VaultCharcoal, VaultElevated, VaultCharcoal),
-                            start = Offset(shimmerX, 0f),
-                            end = Offset(shimmerX + 100f, 0f)
-                        )
-                    )
+                    .shimmerBrush(shimmerX)
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(VaultCharcoal, VaultElevated, VaultCharcoal),
-                            start = Offset(shimmerX, 0f),
-                            end = Offset(shimmerX + 300f, 0f)
-                        )
-                    )
+                    .shimmerBrush(shimmerX)
             )
         }
     }
+}
+
+private fun Modifier.shimmerBrush(x: Float): Modifier {
+    return this.background(
+        Brush.linearGradient(
+            colors = listOf(VaultCharcoal, VaultElevated, VaultCharcoal),
+            start = Offset(x, 0f),
+            end = Offset(x + 200f, 0f)
+        )
+    )
 }

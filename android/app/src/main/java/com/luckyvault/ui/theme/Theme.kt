@@ -86,13 +86,6 @@ private val DarkColorScheme = darkColorScheme(
     outline = VaultSubtle,
     outlineVariant = VaultSubtle,
     scrim = Color.Black,
-    surfaceBright = VaultCharcoal,
-    surfaceDim = VaultBlack,
-    surfaceContainerLowest = VaultBlack,
-    surfaceContainerLow = VaultGraphite,
-    surfaceContainer = VaultCharcoal,
-    surfaceContainerHigh = VaultElevated,
-    surfaceContainerHighest = VaultSubtle,
 )
 
 private val LightColorScheme = lightColorScheme(

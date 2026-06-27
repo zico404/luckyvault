@@ -1,6 +1,7 @@
 package com.luckyvault.ui.screens.home
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -258,9 +260,7 @@ private fun DrawCard(draw: DrawDto, onBuy: () -> Unit, onDetails: () -> Unit) {
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
-                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                        brush = Brush.linearGradient(listOf(VaultSubtle, VaultSubtle))
-                    )
+                    border = BorderStroke(1.dp, SolidColor(VaultSubtle))
                 ) {
                     Text("Details", fontSize = 13.sp)
                 }

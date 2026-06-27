@@ -1,6 +1,7 @@
 package com.luckyvault.ui.screens.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -73,11 +74,11 @@ fun ProfileScreen(
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     ProfileInfoRow(Icons.Default.PersonOutline, "Name", uiState.user?.displayName ?: "Not set")
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp).height(1.dp).background(VaultSubtle))
                     ProfileInfoRow(Icons.Default.MailOutline, "Email", uiState.user?.email ?: "Not set")
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp).height(1.dp).background(VaultSubtle))
                     ProfileInfoRow(Icons.Default.AccountBalanceWallet, "Balance", "$${String.format("%.2f", uiState.wallet?.balance ?: 0.0)}")
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp).height(1.dp).background(VaultSubtle))
                     ProfileInfoRow(Icons.Default.Badge, "Role", uiState.user?.role ?: "USER")
                 }
             }
@@ -90,9 +91,7 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth().height(48.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Crimson),
-                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                    brush = androidx.compose.ui.graphics.SolidColor(Crimson.copy(alpha = 0.3f))
-                )
+                border = BorderStroke(1.dp, Crimson.copy(alpha = 0.3f))
             ) {
                 Icon(Icons.Default.Logout, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
