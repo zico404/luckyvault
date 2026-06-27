@@ -153,7 +153,7 @@ export function AdminPage() {
                       </div>
                       <div>
                         <p className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                          ${topUp.amount.toFixed(2)} top-up
+                          ${Number(topUp.amount).toFixed(2)} top-up
                         </p>
                         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                           {topUp.user?.email || 'Unknown'} · {topUp.paymentMethod} · {new Date(topUp.createdAt).toLocaleDateString()}

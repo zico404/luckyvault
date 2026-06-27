@@ -58,7 +58,7 @@ export function ProfilePage() {
         <Divider />
         <ProfileRow icon={<Mail className="w-4 h-4" />} label="Email" value={user?.email || 'Not set'} />
         <Divider />
-        <ProfileRow icon={<Wallet className="w-4 h-4" />} label="Balance" value={`$${(wallet?.balance || 0).toFixed(2)}`} />
+        <ProfileRow icon={<Wallet className="w-4 h-4" />} label="Balance" value={`$${Number(wallet?.balance || 0).toFixed(2)}`} />
         <Divider />
         <ProfileRow icon={<Badge className="w-4 h-4" />} label="Role" value={user?.role || 'USER'} />
       </div>

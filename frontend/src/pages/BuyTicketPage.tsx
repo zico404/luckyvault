@@ -67,11 +67,11 @@ export function BuyTicketPage() {
         <div className="grid grid-cols-3 gap-3 text-center">
           <div className="p-3 rounded-lg" style={{ background: 'var(--vault-charcoal)' }}>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Prize</p>
-            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>${draw.prizePool.toFixed(0)}</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>${Number(draw.prizePool).toFixed(0)}</p>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--vault-charcoal)' }}>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Price</p>
-            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>${draw.ticketPrice.toFixed(2)}</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>${Number(draw.ticketPrice).toFixed(2)}</p>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--vault-charcoal)' }}>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Left</p>
@@ -105,7 +105,7 @@ export function BuyTicketPage() {
         {purchasing ? (
           <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
         ) : (
-          `Purchase ticket — $${draw.ticketPrice.toFixed(2)}`
+          `Purchase ticket — $${Number(draw.ticketPrice).toFixed(2)}`
         )}
       </button>
     </div>

@@ -36,11 +36,9 @@ fun WalletScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var mockLoading by remember { mutableStateOf<Double?>(null) }
 
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
-            mockLoading = null
             snackbarHostState.showSnackbar(it)
             viewModel.clearSnackbar()
         }
@@ -128,17 +126,21 @@ fun WalletScreen(
                         Spacer(Modifier.height(10.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             QUICK_AMOUNTS.forEach { amt ->
-                                val isLoading = mockLoading == amt
+                                val isLoading = uiState.topUpLoading == amt
+                                val isDisabled = uiState.topUpLoading != null && !isLoading
                                 Surface(
                                     modifier = Modifier
                                         .weight(1f)
                                         .height(40.dp)
-                                        .clickable(enabled = mockLoading == null) {
-                                            mockLoading = amt
+                                        .clickable(enabled = uiState.topUpLoading == null) {
                                             viewModel.topUp(amt)
                                         },
                                     shape = RoundedCornerShape(10.dp),
-                                    color = if (isLoading) Champagne else VaultCharcoal
+                                    color = when {
+                                        isLoading -> Champagne
+                                        isDisabled -> VaultCharcoal.copy(alpha = 0.5f)
+                                        else -> VaultCharcoal
+                                    }
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
                                         if (isLoading) {
@@ -152,7 +154,7 @@ fun WalletScreen(
                                                 "$${amt.toInt()}",
                                                 fontWeight = FontWeight.Medium,
                                                 fontSize = 13.sp,
-                                                color = TextSecondary
+                                                color = if (isDisabled) TextDisabled else TextSecondary
                                             )
                                         }
                                     }

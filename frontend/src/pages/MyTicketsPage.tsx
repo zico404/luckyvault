@@ -60,7 +60,7 @@ export function MyTicketsPage() {
                     {ticket.status}
                   </span>
                   <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                    ${ticket.purchasePrice.toFixed(2)}
+                    ${Number(ticket.purchasePrice).toFixed(2)}
                   </p>
                 </div>
               </div>

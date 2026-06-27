@@ -73,13 +73,13 @@ function DrawCard({ draw }: { draw: Draw }) {
           <div>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Prize pool</p>
             <p className="text-lg font-medium mt-0.5" style={{ color: 'var(--text-primary)' }}>
-              ${draw.prizePool.toFixed(0)}
+              ${Number(draw.prizePool).toFixed(0)}
             </p>
           </div>
           <div>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Ticket price</p>
             <p className="text-lg font-medium mt-0.5" style={{ color: 'var(--text-primary)' }}>
-              ${draw.ticketPrice.toFixed(2)}
+              ${Number(draw.ticketPrice).toFixed(2)}
             </p>
           </div>
           <div>

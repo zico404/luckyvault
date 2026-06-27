@@ -121,7 +121,7 @@ export function WalletPage() {
                     )}
                   </div>
                   <p className="text-sm font-medium shrink-0" style={{ color }}>
-                    {isCredit ? '+' : '-'}${tx.amount.toFixed(2)}
+                    {isCredit ? '+' : '-'}${Number(tx.amount).toFixed(2)}
                   </p>
                 </div>
               )

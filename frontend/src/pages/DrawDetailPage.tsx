@@ -48,7 +48,7 @@ export function DrawDetailPage() {
           <span className="vault-badge vault-badge-success">{draw.status}</span>
         </div>
         <p className="text-3xl font-light" style={{ color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-          ${draw.prizePool.toFixed(2)}
+          ${Number(draw.prizePool).toFixed(2)}
         </p>
         <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Prize pool</p>
       </div>
@@ -58,7 +58,7 @@ export function DrawDetailPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Ticket price</p>
-            <p className="text-base font-medium mt-1" style={{ color: 'var(--text-primary)' }}>${draw.ticketPrice.toFixed(2)}</p>
+            <p className="text-base font-medium mt-1" style={{ color: 'var(--text-primary)' }}>${Number(draw.ticketPrice).toFixed(2)}</p>
           </div>
           <div>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Sold</p>
@@ -102,7 +102,7 @@ export function DrawDetailPage() {
                   <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{w.ticketId}</span>
                 </div>
                 {w.prize > 0 && (
-                  <span className="text-sm font-medium" style={{ color: 'var(--emerald)' }}>${w.prize.toFixed(2)}</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--emerald)' }}>${Number(w.prize).toFixed(2)}</span>
                 )}
               </div>
             ))}
@@ -113,7 +113,7 @@ export function DrawDetailPage() {
       {/* Buy button */}
       {draw.status === 'OPEN' && (
         <Link to={`/draws/${draw.id}/buy`} className="btn-primary w-full h-12 text-center block">
-          Buy ticket for ${draw.ticketPrice.toFixed(2)}
+          Buy ticket for ${Number(draw.ticketPrice).toFixed(2)}
         </Link>
       )}
     </div>

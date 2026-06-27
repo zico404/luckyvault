@@ -19,7 +19,8 @@ data class WalletUiState(
     val page: Int = 1,
     val totalPages: Int = 1,
     val error: String? = null,
-    val snackbarMessage: String? = null
+    val snackbarMessage: String? = null,
+    val topUpLoading: Double? = null
 )
 
 @HiltViewModel
@@ -55,18 +56,20 @@ class WalletViewModel @Inject constructor(
 
     fun topUp(amount: Double) {
         viewModelScope.launch {
+            _uiState.update { it.copy(topUpLoading = amount) }
             val result = walletRepository.topUp(amount)
+            _uiState.update { it.copy(topUpLoading = null) }
             result.fold(
                 onSuccess = {
+                    _uiState.update {
+                        it.copy(snackbarMessage = "$${String.format("%.2f", amount)} top-up submitted — pending admin approval")
+                    }
                     loadData()
-                    _uiState.value = _uiState.value.copy(
-                        snackbarMessage = "$${String.format("%.2f", amount)} top-up submitted — pending admin approval"
-                    )
                 },
                 onFailure = { e ->
-                    _uiState.value = _uiState.value.copy(
-                        snackbarMessage = e.message ?: "Top-up failed"
-                    )
+                    _uiState.update {
+                        it.copy(snackbarMessage = e.message ?: "Top-up failed")
+                    }
                 }
             )
         }
