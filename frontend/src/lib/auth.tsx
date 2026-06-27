@@ -33,11 +33,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     try {
       const res = await api.login(email, password)
-      if (res.success) {
-        setUser(res.data.user)
-        return { success: true }
-      }
-      return { success: false, error: res.error || 'Invalid credentials' }
+      setUser(res.data.user)
+      return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || 'Login failed. Please try again.' }
     }
@@ -46,11 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(async (email: string, password: string, displayName?: string) => {
     try {
       const res = await api.register(email, password, displayName)
-      if (res.success) {
-        setUser(res.data.user)
-        return { success: true }
-      }
-      return { success: false, error: res.error || 'Registration failed' }
+      setUser(res.data.user)
+      return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || 'Registration failed. Please try again.' }
     }
