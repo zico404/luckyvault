@@ -28,13 +28,33 @@ fun BuyTicketScreen(
     viewModel: BuyTicketViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.success) {
         if (uiState.success) onTicketPurchased()
     }
 
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Buy ticket", onBack = onBack) },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = VaultElevated,
+                    contentColor = TextPrimary,
+                    actionColor = Champagne,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        },
         containerColor = VaultBlack
     ) { padding ->
         if (uiState.isLoading && uiState.draw == null) {
@@ -104,12 +124,6 @@ fun BuyTicketScreen(
                         color = Crimson,
                         style = MaterialTheme.typography.bodySmall
                     )
-                }
-
-                // Error
-                if (uiState.error != null) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(uiState.error!!, color = Crimson, style = MaterialTheme.typography.bodySmall)
                 }
 
                 Spacer(Modifier.weight(1f))

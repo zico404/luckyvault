@@ -141,3 +141,12 @@ data class UnreadCountResponse(
 data class PurchaseTicketRequest(
     @SerializedName("drawId") val drawId: String
 )
+
+data class TopUpRequest(
+    @SerializedName("amount") val amount: Double,
+    @SerializedName("paymentMethod") val paymentMethod: String
+)
+
+data class TopUpResponse(
+    @SerializedName("transaction") val transaction: TransactionDto
+)

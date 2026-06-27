@@ -69,4 +69,7 @@ interface ApiService {
 
     @PATCH("notifications/read-all")
     suspend fun markAllNotificationsRead(): Response<ApiResponse<Unit>>
+
+    @POST("wallet/topup")
+    suspend fun topUp(@Body request: TopUpRequest): Response<ApiResponse<TopUpResponse>>
 }

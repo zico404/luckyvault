@@ -21,6 +21,7 @@ enum TicketStatus {
 
 enum TransactionType {
   DEPOSIT
+  TOP_UP
   PURCHASE
   WINNING
   REFUND

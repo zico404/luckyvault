@@ -15,6 +15,7 @@ data class AuthUiState(
     val isLoading: Boolean = false,
     val user: UserDto? = null,
     val error: String? = null,
+    val snackbarMessage: String? = null,
     val isRegistered: Boolean = false
 )
 
@@ -47,7 +48,7 @@ class AuthViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(isLoading = false, user = user, isRegistered = true)
                 },
                 onFailure = { e ->
-                    _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = e.message, snackbarMessage = e.message)
                 }
             )
         }
@@ -62,7 +63,7 @@ class AuthViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(isLoading = false, user = user, isRegistered = true)
                 },
                 onFailure = { e ->
-                    _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = e.message, snackbarMessage = e.message)
                 }
             )
         }
@@ -77,5 +78,9 @@ class AuthViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun clearSnackbar() {
+        _uiState.value = _uiState.value.copy(snackbarMessage = null)
     }
 }

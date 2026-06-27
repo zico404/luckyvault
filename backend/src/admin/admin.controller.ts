@@ -5,6 +5,7 @@ import { UserRole } from '@prisma/client';
 import { DrawsService } from '../draws/draws.service';
 import { UsersService } from '../users/users.service';
 import { AuditService } from '../audit/audit.service';
+import { WalletService } from '../wallet/wallet.service';
 import { successResponse } from '../common/response.util';
 import { CreateDrawDto, UpdateDrawDto } from './dto';
 
@@ -16,6 +17,7 @@ export class AdminController {
     private drawsService: DrawsService,
     private usersService: UsersService,
     private auditService: AuditService,
+    private walletService: WalletService,
   ) {}
 
   @Get('dashboard')
@@ -27,6 +29,9 @@ export class AdminController {
         'GET /admin/draws',
         'POST /admin/draws',
         'POST /admin/draws/:id/execute',
+        'GET /admin/topups/pending',
+        'POST /admin/topups/:id/approve',
+        'POST /admin/topups/:id/reject',
         'GET /admin/audit-logs',
       ],
     });
@@ -77,6 +82,24 @@ export class AdminController {
   async executeDraw(@Param('id') id: string) {
     const result = await this.drawsService.executeDraw(id);
     return successResponse(result, 'Draw executed');
+  }
+
+  @Get('topups/pending')
+  async getPendingTopUps() {
+    const result = await this.walletService.getPendingTopUps();
+    return successResponse(result);
+  }
+
+  @Post('topups/:id/approve')
+  async approveTopUp(@Param('id') id: string) {
+    const result = await this.walletService.approveTopUp(id);
+    return successResponse(result, 'Top-up approved');
+  }
+
+  @Post('topups/:id/reject')
+  async rejectTopUp(@Param('id') id: string) {
+    const result = await this.walletService.rejectTopUp(id);
+    return successResponse(result, 'Top-up rejected');
   }
 
   @Get('audit-logs')

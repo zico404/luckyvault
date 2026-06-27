@@ -89,4 +89,73 @@ export class WalletService {
       return { transaction, newBalance };
     });
   }
+
+  async topUp(userId: string, amount: number, paymentMethod: string) {
+    if (amount <= 0) throw new BadRequestException('Amount must be positive');
+
+    const wallet = await this.prisma.wallet.findUnique({ where: { userId } });
+    if (!wallet) throw new NotFoundException('Wallet not found');
+
+    const transaction = await this.prisma.transaction.create({
+      data: {
+        walletId: wallet.id,
+        type: 'TOP_UP',
+        amount,
+        balanceAfter: wallet.balance,
+        status: 'PENDING',
+        description: `Top-up via ${paymentMethod}`,
+        metadata: { paymentMethod, requestedBy: userId },
+      },
+    });
+
+    return { transaction };
+  }
+
+  async approveTopUp(transactionId: string) {
+    const transaction = await this.prisma.transaction.findUnique({ where: { id: transactionId } });
+    if (!transaction) throw new NotFoundException('Transaction not found');
+    if (transaction.status !== 'PENDING') throw new BadRequestException('Transaction is not pending');
+    if (transaction.type !== 'TOP_UP') throw new BadRequestException('Only TOP_UP transactions can be approved');
+
+    return this.prisma.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findUnique({ where: { id: transaction.walletId } });
+      if (!wallet) throw new NotFoundException('Wallet not found');
+
+      const newBalance = new Decimal(wallet.balance).plus(transaction.amount);
+      await tx.wallet.update({ where: { id: wallet.id }, data: { balance: newBalance } });
+
+      const updated = await tx.transaction.update({
+        where: { id: transactionId },
+        data: { status: 'COMPLETED', balanceAfter: newBalance },
+      });
+
+      return { transaction: updated, newBalance };
+    });
+  }
+
+  async rejectTopUp(transactionId: string) {
+    const transaction = await this.prisma.transaction.findUnique({ where: { id: transactionId } });
+    if (!transaction) throw new NotFoundException('Transaction not found');
+    if (transaction.status !== 'PENDING') throw new BadRequestException('Transaction is not pending');
+    if (transaction.type !== 'TOP_UP') throw new BadRequestException('Only TOP_UP transactions can be rejected');
+
+    const updated = await this.prisma.transaction.update({
+      where: { id: transactionId },
+      data: { status: 'CANCELLED' },
+    });
+
+    return { transaction: updated };
+  }
+
+  async getPendingTopUps() {
+    return this.prisma.transaction.findMany({
+      where: { type: 'TOP_UP', status: 'PENDING' },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        wallet: {
+          include: { user: { select: { id: true, email: true, displayName: true } } },
+        },
+      },
+    });
+  }
 }

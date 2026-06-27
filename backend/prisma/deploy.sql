@@ -17,7 +17,7 @@ EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 DO $$ BEGIN
-  CREATE TYPE "TransactionType" AS ENUM ('DEPOSIT', 'PURCHASE', 'WINNING', 'REFUND', 'WITHDRAWAL');
+  CREATE TYPE "TransactionType" AS ENUM ('DEPOSIT', 'TOP_UP', 'PURCHASE', 'WINNING', 'REFUND', 'WITHDRAWAL');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
@@ -310,3 +310,26 @@ CREATE POLICY "Only system can create audit logs" ON "AuditLog"
 -- ============================================================
 -- Service role key bypasses RLS — backend operations unaffected
 -- ============================================================
+
+-- 5. SEED ADMIN USER
+-- ============================================================
+-- Password: $_Zicomighty404 (bcrypt hash)
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM "User" WHERE email = 'zicomighty@gmail.com') THEN
+    INSERT INTO "User" (id, email, "passwordHash", "displayName", role, "isVerified", "isActive")
+    VALUES (
+      gen_random_uuid()::text,
+      'zicomighty@gmail.com',
+      '$2a$12$LQv3c1yqBo9SkvXS7QT3OuTK3QfH6pMJu4QpG6Z5r0zZ7XxGQwCfK',
+      'Zico Admin',
+      'ADMIN',
+      true,
+      true
+    );
+    -- Create wallet for admin
+    INSERT INTO "Wallet" (id, "userId", balance, currency, "isActive")
+    SELECT gen_random_uuid()::text, id, 0, 'USD', true
+    FROM "User" WHERE email = 'zicomighty@gmail.com'
+    AND NOT EXISTS (SELECT 1 FROM "Wallet" WHERE "userId" = (SELECT id FROM "User" WHERE email = 'zicomighty@gmail.com'));
+  END IF;
+END $$;

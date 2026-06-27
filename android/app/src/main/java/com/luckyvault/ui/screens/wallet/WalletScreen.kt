@@ -28,10 +28,10 @@ import com.luckyvault.ui.theme.*
 @Composable
 fun WalletScreen(
     onBack: () -> Unit,
+    onNavigateToTopUp: () -> Unit = {},
     viewModel: WalletViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showTopUp by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Wallet", onBack = onBack) },
@@ -76,7 +76,7 @@ fun WalletScreen(
                             Spacer(Modifier.height(20.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                 Button(
-                                    onClick = { showTopUp = true },
+                                    onClick = onNavigateToTopUp,
                                     colors = ButtonDefaults.buttonColors(containerColor = Champagne, contentColor = VaultBlack),
                                     shape = RoundedCornerShape(10.dp),
                                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -123,30 +123,6 @@ fun WalletScreen(
 
             item { Spacer(Modifier.height(8.dp)) }
         }
-    }
-
-    // Top up dialog
-    if (showTopUp) {
-        AlertDialog(
-            onDismissRequest = { showTopUp = false },
-            title = { Text("Top up wallet", fontWeight = FontWeight.SemiBold) },
-            text = { Text("Select an amount to add to your wallet.", color = TextSecondary) },
-            confirmButton = {
-                Button(
-                    onClick = { showTopUp = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = Champagne, contentColor = VaultBlack),
-                    shape = RoundedCornerShape(10.dp)
-                ) { Text("Confirm") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showTopUp = false }) {
-                    Text("Cancel", color = TextSecondary)
-                }
-            },
-            containerColor = VaultGraphite,
-            titleContentColor = TextPrimary,
-            shape = RoundedCornerShape(20.dp)
-        )
     }
 }
 

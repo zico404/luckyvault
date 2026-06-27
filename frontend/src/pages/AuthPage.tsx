@@ -1,35 +1,36 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/lib/auth'
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { useToast } from '@/components/Toast'
+import { Mail, Lock, User, Eye, EyeOff, Smartphone } from 'lucide-react'
 import { VaultMark } from '@/components/VaultLogo'
 
 export function AuthPage() {
   const navigate = useNavigate()
   const { login, register } = useAuth()
+  const { toast } = useToast()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
     try {
       const result = isLogin
         ? await login(email, password)
         : await register(email, password, displayName || undefined)
       if (result.success) {
+        toast(isLogin ? 'Welcome back!' : 'Account created successfully')
         navigate('/')
       } else {
-        setError(result.error || 'Authentication failed. Please check your credentials.')
+        toast(result.error || 'Authentication failed. Please check your credentials.', 'error')
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred. Please try again.')
+      toast(err.message || 'An error occurred. Please try again.', 'error')
     } finally {
       setLoading(false)
     }
@@ -119,24 +120,18 @@ export function AuthPage() {
               </div>
             </div>
 
-            {/* Error */}
-            {error && (
-              <div
-                className="p-3 rounded-lg text-sm text-center animate-fade-in"
-                style={{ background: 'rgba(220, 38, 38, 0.08)', color: 'var(--crimson)', border: '1px solid rgba(220, 38, 38, 0.15)' }}
-              >
-                {error}
-              </div>
-            )}
-
             {/* Submit */}
             <button
               type="submit"
               disabled={loading || !email || password.length < 8}
               className="btn-primary w-full h-12 mt-2"
+              style={loading ? { pointerEvents: 'auto', opacity: 0.8 } : undefined}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  <span>{isLogin ? 'Signing in...' : 'Creating account...'}</span>
+                </span>
               ) : (
                 isLogin ? 'Sign in' : 'Create account'
               )}
@@ -147,9 +142,9 @@ export function AuthPage() {
           <div className="my-6 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--vault-subtle), transparent)' }} />
 
           {/* Toggle */}
-          <div className="text-center">
+          <div className="text-center mb-6">
             <button
-              onClick={() => { setIsLogin(!isLogin); setError('') }}
+              onClick={() => { setIsLogin(!isLogin) }}
               className="text-sm transition-colors"
               style={{ color: 'var(--text-muted)' }}
             >
@@ -160,6 +155,31 @@ export function AuthPage() {
               )}
             </button>
           </div>
+
+          {/* Get it on Play Store */}
+          <a
+            href="https://play.google.com/store/apps/details?id=com.luckyvault"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 w-full h-12 rounded-xl transition-all duration-200 hover:scale-[1.01]"
+            style={{
+              background: '#000',
+              border: '1px solid #5F6368',
+              color: '#fff',
+            }}
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+              <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92z" fill="#4285F4"/>
+              <path d="M16.296 15.504L13.792 12l2.504-3.504 4.256 2.44a1 1 0 010 1.732l-4.256 1.836z" fill="#34A853"/>
+              <path d="M16.296 8.496L13.792 12l-10.183 9.814 12.687-13.318z" fill="#EA4335"/>
+              <path d="M20.552 12.712l-4.256-2.44L13.792 12l2.504 3.504 4.256-1.792a1 1 0 000-1.836l-.004-.164z" fill="#FBBC04"/>
+              <path d="M3.61 1.814L13.792 12l2.504-3.504L3.609.894a1 1 0 00-.61-.08z" fill="#EA4335"/>
+            </svg>
+            <div className="flex flex-col items-start leading-tight">
+              <span className="text-[10px] font-normal" style={{ color: '#aaa' }}>GET IT ON</span>
+              <span className="text-sm font-semibold" style={{ color: '#fff' }}>Google Play</span>
+            </div>
+          </a>
         </div>
 
         {/* Footer text */}

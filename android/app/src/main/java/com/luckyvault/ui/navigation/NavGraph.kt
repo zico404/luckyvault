@@ -13,6 +13,7 @@ import com.luckyvault.ui.screens.home.HomeScreen
 import com.luckyvault.ui.screens.tickets.BuyTicketScreen
 import com.luckyvault.ui.screens.tickets.MyTicketsScreen
 import com.luckyvault.ui.screens.wallet.WalletScreen
+import com.luckyvault.ui.screens.wallet.TopUpScreen
 import com.luckyvault.ui.screens.profile.ProfileScreen
 import com.luckyvault.ui.screens.notifications.NotificationsScreen
 import com.luckyvault.ui.screens.draws.DrawDetailScreen
@@ -23,6 +24,7 @@ object Routes {
     const val BUY_TICKET = "buy_ticket/{drawId}"
     const val MY_TICKETS = "my_tickets"
     const val WALLET = "wallet"
+    const val TOP_UP = "topup"
     const val PROFILE = "profile"
     const val NOTIFICATIONS = "notifications"
     const val DRAW_DETAIL = "draw_detail/{drawId}"
@@ -95,7 +97,15 @@ fun LuckyVaultNavGraph() {
 
         composable(Routes.WALLET) {
             WalletScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToTopUp = { navController.navigate(Routes.TOP_UP) }
+            )
+        }
+
+        composable(Routes.TOP_UP) {
+            TopUpScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToWallet = { navController.navigate(Routes.WALLET) { popUpTo(Routes.WALLET) { inclusive = true } } }
             )
         }
 

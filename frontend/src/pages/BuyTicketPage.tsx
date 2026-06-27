@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api, Draw } from '@/lib/api'
+import { useToast } from '@/components/Toast'
 import { ArrowLeft, DollarSign, AlertCircle } from 'lucide-react'
 
 export function BuyTicketPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [draw, setDraw] = useState<Draw | null>(null)
   const [balance, setBalance] = useState(0)
   const [loading, setLoading] = useState(true)
   const [purchasing, setPurchasing] = useState(false)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     if (id) {
@@ -28,12 +29,12 @@ export function BuyTicketPage() {
   const handlePurchase = async () => {
     if (!id) return
     setPurchasing(true)
-    setError('')
     try {
       await api.purchaseTicket(id)
       navigate('/tickets')
     } catch (e: any) {
-      setError(e?.response?.data?.error || 'Failed to purchase ticket')
+      const msg = e?.response?.data?.error || e?.message || 'Failed to purchase ticket'
+      toast(msg, 'error')
     } finally {
       setPurchasing(false)
     }
@@ -94,13 +95,6 @@ export function BuyTicketPage() {
           </div>
         )}
       </div>
-
-      {/* Error */}
-      {error && (
-        <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(220,38,38,0.08)', color: 'var(--crimson)' }}>
-          {error}
-        </div>
-      )}
 
       {/* Purchase button */}
       <button

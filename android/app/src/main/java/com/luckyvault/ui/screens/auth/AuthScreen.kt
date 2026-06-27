@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -35,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.luckyvault.ui.components.VaultMark
 import com.luckyvault.ui.theme.*
+import android.content.Intent
+import android.net.Uri
 
 @Composable
 fun AuthScreen(
@@ -48,176 +51,250 @@ fun AuthScreen(
     var displayName by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(uiState.isRegistered) {
         if (uiState.isRegistered) onNavigateToHome()
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(VaultBlack)
-    ) {
-        Column(
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearSnackbar()
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = VaultElevated,
+                    contentColor = TextPrimary,
+                    actionColor = Champagne,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        },
+        containerColor = Color.Transparent
+    ) { padding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(VaultBlack)
+                .padding(padding)
         ) {
-            Spacer(Modifier.weight(0.3f))
-
-            // Logo mark
-            Box(
-                modifier = Modifier.size(72.dp),
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                VaultMark(size = 72)
-            }
+                Spacer(Modifier.weight(0.3f))
 
-            Spacer(Modifier.height(24.dp))
-
-            Text(
-                text = "LUCKY VAULT",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 4.sp,
-                color = TextPrimary
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = if (isLoginMode) "Welcome back" else "Create your account",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextMuted,
-                letterSpacing = 0.5.sp
-            )
-
-            Spacer(Modifier.height(48.dp))
-
-            // Form Card
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                color = VaultGraphite
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                Box(
+                    modifier = Modifier.size(72.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    VaultTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = "Email",
-                        icon = Icons.Default.Email,
-                        keyboardType = KeyboardType.Email,
-                        imeAction = ImeAction.Next,
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                    )
+                    VaultMark(size = 72)
+                }
 
-                    AnimatedVisibility(
-                        visible = !isLoginMode,
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
+                Spacer(Modifier.height(24.dp))
+
+                Text(
+                    text = "LUCKY VAULT",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 4.sp,
+                    color = TextPrimary
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = if (isLoginMode) "Welcome back" else "Create your account",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextMuted,
+                    letterSpacing = 0.5.sp
+                )
+
+                Spacer(Modifier.height(48.dp))
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = VaultGraphite
+                ) {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         VaultTextField(
-                            value = displayName,
-                            onValueChange = { displayName = it },
-                            label = "Display name",
-                            icon = Icons.Default.Person,
+                            value = email,
+                            onValueChange = { email = it },
+                            label = "Email",
+                            icon = Icons.Default.Email,
+                            keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next,
                             onNext = { focusManager.moveFocus(FocusDirection.Down) }
                         )
-                    }
 
-                    VaultTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = "Password",
-                        icon = Icons.Default.Lock,
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done,
-                        isPassword = true,
-                        passwordVisible = passwordVisible,
-                        onTogglePassword = { passwordVisible = !passwordVisible },
-                        onDone = {
-                            focusManager.clearFocus()
-                            if (isLoginMode) viewModel.login(email, password)
-                            else viewModel.register(email, password, displayName.ifBlank { null })
+                        AnimatedVisibility(
+                            visible = !isLoginMode,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically()
+                        ) {
+                            VaultTextField(
+                                value = displayName,
+                                onValueChange = { displayName = it },
+                                label = "Display name",
+                                icon = Icons.Default.Person,
+                                imeAction = ImeAction.Next,
+                                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                            )
                         }
-                    )
-                }
-            }
 
-            // Error
-            AnimatedVisibility(visible = uiState.error != null) {
+                        VaultTextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = "Password",
+                            icon = Icons.Default.Lock,
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done,
+                            isPassword = true,
+                            passwordVisible = passwordVisible,
+                            onTogglePassword = { passwordVisible = !passwordVisible },
+                            onDone = {
+                                focusManager.clearFocus()
+                                if (isLoginMode) viewModel.login(email, password)
+                                else viewModel.register(email, password, displayName.ifBlank { null })
+                            }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                // Primary Button — always interactive
+                Button(
+                    onClick = {
+                        if (isLoginMode) viewModel.login(email, password)
+                        else viewModel.register(email, password, displayName.ifBlank { null })
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    enabled = !uiState.isLoading && email.isNotBlank() && password.length >= 8,
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Champagne,
+                        disabledContainerColor = VaultCharcoal,
+                        contentColor = VaultBlack,
+                        disabledContentColor = TextDisabled
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp
+                    )
+                ) {
+                    if (uiState.isLoading) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = VaultBlack,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = if (isLoginMode) "Signing in..." else "Creating account...",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 15.sp,
+                                letterSpacing = 0.3.sp
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = if (isLoginMode) "Sign in" else "Create account",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 15.sp,
+                            letterSpacing = 0.3.sp
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Toggle
                 Text(
-                    text = uiState.error ?: "",
-                    color = Crimson,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 12.dp),
-                    textAlign = TextAlign.Center
+                    text = buildString {
+                        append(if (isLoginMode) "New here? " else "Already have an account? ")
+                        append(if (isLoginMode) "Create an account" else "Sign in")
+                    },
+                    color = TextMuted,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable {
+                        isLoginMode = !isLoginMode
+                        viewModel.clearError()
+                    }
                 )
-            }
 
-            Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(24.dp))
 
-            // Primary Button
-            Button(
-                onClick = {
-                    if (isLoginMode) viewModel.login(email, password)
-                    else viewModel.register(email, password, displayName.ifBlank { null })
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                enabled = !uiState.isLoading && email.isNotBlank() && password.length >= 8,
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Champagne,
-                    disabledContainerColor = VaultCharcoal,
-                    contentColor = VaultBlack,
-                    disabledContentColor = TextDisabled
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp
-                )
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = if (email.isNotBlank() && password.length >= 8) VaultBlack else TextDisabled,
-                        strokeWidth = 2.dp
+                // Get it on Google Play
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .clickable {
+                            try {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("market://details?id=com.luckyvault")
+                                )
+                                context.startActivity(intent)
+                            } catch (_: Exception) {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/store/apps/details?id=com.luckyvault")
+                                )
+                                context.startActivity(intent)
+                            }
+                        },
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFF000000),
+                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                        brush = Brush.linearGradient(listOf(Color(0xFF5F6368), Color(0xFF5F6368)))
                     )
-                } else {
-                    Text(
-                        text = if (isLoginMode) "Sign in" else "Create account",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 15.sp,
-                        letterSpacing = 0.3.sp
-                    )
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "GET IT ON",
+                            fontSize = 10.sp,
+                            color = Color(0xFFAAAAAA),
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        Text(
+                            text = "Google Play",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    }
                 }
+
+                Spacer(Modifier.weight(0.5f))
             }
-
-            Spacer(Modifier.height(20.dp))
-
-            // Toggle
-            Text(
-                text = buildString {
-                    append(if (isLoginMode) "New here? " else "Already have an account? ")
-                    append(if (isLoginMode) "Create an account" else "Sign in")
-                },
-                color = TextMuted,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.clickable {
-                    isLoginMode = !isLoginMode
-                    viewModel.clearError()
-                }
-            )
-
-            Spacer(Modifier.weight(0.5f))
         }
     }
 }

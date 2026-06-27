@@ -11,8 +11,10 @@ const DrawDetailPage = lazy(() => import('@/pages/DrawDetailPage').then(m => ({ 
 const BuyTicketPage = lazy(() => import('@/pages/BuyTicketPage').then(m => ({ default: m.BuyTicketPage })))
 const MyTicketsPage = lazy(() => import('@/pages/MyTicketsPage').then(m => ({ default: m.MyTicketsPage })))
 const WalletPage = lazy(() => import('@/pages/WalletPage').then(m => ({ default: m.WalletPage })))
+const TopUpPage = lazy(() => import('@/pages/TopUpPage').then(m => ({ default: m.TopUpPage })))
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })))
+const AdminPage = lazy(() => import('@/pages/AdminPage').then(m => ({ default: m.AdminPage })))
 
 function PageLoader() {
   return (
@@ -57,8 +59,10 @@ export default function App() {
           <Route path="/draws/:id/buy" element={<ProtectedRoute><BuyTicketPage /></ProtectedRoute>} />
           <Route path="/tickets" element={<ProtectedRoute><MyTicketsPage /></ProtectedRoute>} />
           <Route path="/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
+          <Route path="/wallet/topup" element={<ProtectedRoute><TopUpPage /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="*" element={
             <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--vault-black)' }}>
               <div className="text-center space-y-4 animate-fade-in">

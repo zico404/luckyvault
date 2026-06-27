@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api, Transaction } from '@/lib/api'
-import { Wallet, ArrowUpRight, ArrowDownLeft, Plus, Minus, Trophy, ArrowRight } from 'lucide-react'
+import { Wallet, ArrowUpRight, ArrowDownLeft, Plus, Minus, ArrowRight } from 'lucide-react'
 
 export function WalletPage() {
+  const navigate = useNavigate()
   const [balance, setBalance] = useState(0)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
-  const [showTopUp, setShowTopUp] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -37,7 +38,7 @@ export function WalletPage() {
           ${balance.toFixed(2)}
         </p>
         <button
-          onClick={() => setShowTopUp(true)}
+          onClick={() => navigate('/wallet/topup')}
           className="btn-primary mt-4"
         >
           <Plus className="w-4 h-4" /> Top up
@@ -89,20 +90,6 @@ export function WalletPage() {
           </div>
         )}
       </div>
-
-      {/* Top up modal */}
-      {showTopUp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)' }}>
-          <div className="vault-card p-6 w-full max-w-sm animate-scale-in">
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Top up wallet</h3>
-            <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>Select an amount to add to your wallet.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setShowTopUp(false)} className="btn-secondary flex-1">Cancel</button>
-              <button onClick={() => setShowTopUp(false)} className="btn-primary flex-1">Confirm</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

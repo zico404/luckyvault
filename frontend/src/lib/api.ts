@@ -224,6 +224,25 @@ class ApiClient {
   async markAllNotificationsRead(): Promise<void> {
     await this.request('/notifications/read-all', { method: 'PATCH' })
   }
+
+  async topUp(amount: number, paymentMethod: string): Promise<ApiResponse<any>> {
+    return this.request('/wallet/topup', {
+      method: 'POST',
+      body: JSON.stringify({ amount, paymentMethod }),
+    })
+  }
+
+  async getPendingTopUps(): Promise<ApiResponse<any[]>> {
+    return this.request<any[]>('/admin/topups/pending')
+  }
+
+  async approveTopUp(id: string): Promise<ApiResponse<any>> {
+    return this.request(`/admin/topups/${id}/approve`, { method: 'POST' })
+  }
+
+  async rejectTopUp(id: string): Promise<ApiResponse<any>> {
+    return this.request(`/admin/topups/${id}/reject`, { method: 'POST' })
+  }
 }
 
 export const api = new ApiClient()
