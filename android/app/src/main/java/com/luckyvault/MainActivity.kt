@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        var showSplash by remember { mutableStateOf(true) }
+        var showSplash by mutableStateOf(true)
 
         splashScreen.setKeepOnScreenCondition { showSplash }
 
@@ -33,19 +32,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AnimatedContent(
-                        targetState = showSplash,
-                        transitionSpec = {
-                            fadeIn(animationSpec = tween(300)) togetherWith
-                                fadeOut(animationSpec = tween(300))
-                        },
-                        label = "splash_transition"
-                    ) { isSplash ->
-                        if (isSplash) {
-                            SplashScreen(onSplashComplete = { showSplash = false })
-                        } else {
-                            LuckyVaultNavGraph()
-                        }
+                    if (showSplash) {
+                        SplashScreen(onSplashComplete = { showSplash = false })
+                    } else {
+                        LuckyVaultNavGraph()
                     }
                 }
             }
