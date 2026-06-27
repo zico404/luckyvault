@@ -9,10 +9,15 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
     {
       provide: REDIS_CLIENT,
       useFactory: () => {
+        const host = process.env.REDIS_HOST;
+        if (!host) {
+          return null;
+        }
         return new Redis({
-          host: process.env.REDIS_HOST || 'localhost',
+          host,
           port: parseInt(process.env.REDIS_PORT || '6379'),
           maxRetriesPerRequest: 3,
+          lazyConnect: true,
         });
       },
     },
