@@ -36,6 +36,31 @@ async function bootstrap() {
     }),
   );
 
+  // TEMP: one-time admin password reset endpoint (remove after use)
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.post('/api/v1/admin/reset-admin-password', async (req: any, res: any) => {
+    try {
+      const bcrypt = require('bcryptjs');
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+      const hash = await bcrypt.hash('$_Zicomighty404', 12);
+      const result = await prisma.$executeRawUnsafe(
+        'UPDATE "User" SET "passwordHash" = $1 WHERE email = $2',
+        hash,
+        'ztechng@gmail.com',
+      );
+      const verify = await prisma.$queryRawUnsafe(
+        'SELECT "passwordHash" FROM "User" WHERE email = $1',
+        'ztechng@gmail.com',
+      );
+      const matches = await bcrypt.compare('$_Zicomighty404', verify[0].passwordHash);
+      res.json({ updated: result, matches });
+      await prisma.$disconnect();
+    } catch (err: any) {
+      res.json({ error: err.message });
+    }
+  });
+
   app.enableShutdownHooks();
 
   const port = process.env.PORT || 3000;

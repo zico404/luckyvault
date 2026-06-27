@@ -171,8 +171,22 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lucky-vault-debug-apk
-          path: apks/
+          path: android/app/build/outputs/apk/debug/
         continue-on-error: true
+
+      - name: Prepare debug APK for release
+        run: |
+          VERSION=$(grep 'versionName' app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          mkdir -p "${{ github.workspace }}/apks"
+          # Find the downloaded debug APK regardless of filename
+          DEBUG_SRC=$(find android/app/build/outputs/apk/debug/ -name '*.apk' 2>/dev/null | head -1)
+          if [ -n "$DEBUG_SRC" ] && [ -f "$DEBUG_SRC" ]; then
+            cp "$DEBUG_SRC" "${{ github.workspace }}/apks/LuckyVault-v${VERSION}-debug.apk"
+            cp "$DEBUG_SRC" "${{ github.workspace }}/apks/LuckyVault-debug.apk"
+            echo "Prepared debug APK for release"
+          else
+            echo "No debug APK found after download"
+          fi
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
