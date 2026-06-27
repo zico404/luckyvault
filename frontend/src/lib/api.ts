@@ -4,6 +4,7 @@ import type {
   Draw,
   DrawDetail,
   DrawsResponse,
+  Ticket,
   TicketsResponse,
   TransactionsResponse,
   NotificationsResponse,
@@ -12,7 +13,7 @@ import type {
   User,
 } from '@/types'
 
-const API_BASE = '/api/v1'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 
 class ApiClient {
   private token: string | null = null
@@ -67,6 +68,11 @@ class ApiClient {
       }
     }
 
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}))
+      throw new Error(errorBody.message || `HTTP ${response.status}`)
+    }
+
     const data = await response.json()
     return data
   }
@@ -81,6 +87,10 @@ class ApiClient {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken: this.refreshToken }),
         })
+        if (!res.ok) {
+          this.clearTokens()
+          return false
+        }
         const data = await res.json()
         if (data.success) {
           this.setTokens(data.data.accessToken, data.data.refreshToken)
@@ -94,7 +104,9 @@ class ApiClient {
       }
     })()
 
-    return this.refreshPromise
+    const result = await this.refreshPromise
+    this.refreshPromise = null
+    return result
   }
 
   isAuthenticated(): boolean {
@@ -131,7 +143,9 @@ class ApiClient {
           body: JSON.stringify({ refreshToken: this.refreshToken }),
         })
       }
-    } catch {}
+    } catch {
+      // Logout is best-effort
+    }
     this.clearTokens()
   }
 

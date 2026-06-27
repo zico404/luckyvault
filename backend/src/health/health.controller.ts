@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('health')
@@ -6,12 +6,23 @@ export class HealthController {
   constructor(private prisma: PrismaService) {}
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   async check() {
+    const checks: Record<string, string> = {};
+
     try {
       await this.prisma.$queryRaw`SELECT 1`;
-      return { status: 'ok', timestamp: new Date().toISOString(), database: 'connected' };
+      checks.database = 'connected';
     } catch {
-      return { status: 'error', timestamp: new Date().toISOString(), database: 'disconnected' };
+      checks.database = 'disconnected';
     }
+
+    const isHealthy = checks.database === 'connected';
+
+    return {
+      status: isHealthy ? 'ok' : 'error',
+      timestamp: new Date().toISOString(),
+      ...checks,
+    };
   }
 }

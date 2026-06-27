@@ -1,15 +1,20 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+  const configService = app.get(ConfigService);
 
   app.setGlobalPrefix('api/v1');
 
-  const isDev = process.env.NODE_ENV !== 'production';
+  const isDev = configService.get('NODE_ENV') !== 'production';
   app.enableCors({
-    origin: isDev ? true : ['https://luckyvault.app', /\.luckyvault\.app$/],
+    origin: isDev
+      ? true
+      : ['https://luckyvault.app', /\.luckyvault\.app$/],
     credentials: true,
   });
 
@@ -18,12 +23,13 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
     }),
   );
 
-  const port = process.env.PORT || 3000;
+  app.enableShutdownHooks();
+
+  const port = configService.get('PORT', 3000);
   await app.listen(port);
-  console.log(`Lucky Vault API running on port ${port} (${isDev ? 'development' : 'production'})`);
+  logger.log(`Lucky Vault API running on port ${port} (${isDev ? 'development' : 'production'})`);
 }
 bootstrap();

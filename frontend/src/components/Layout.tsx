@@ -20,6 +20,14 @@ const navItems = [
   { path: '/profile', icon: User, label: 'Profile' },
 ]
 
+const mobileNavItems = [
+  { path: '/', icon: LayoutDashboard, label: 'Home' },
+  { path: '/draws', icon: Ticket, label: 'Draws' },
+  { path: '/tickets', icon: Ticket, label: 'Tickets' },
+  { path: '/wallet', icon: Wallet, label: 'Wallet' },
+  { path: '/notifications', icon: Bell, label: 'Alerts' },
+]
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const navigate = useNavigate()
@@ -32,7 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
+      {/* Sidebar - Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border p-4">
         <Link to="/" className="flex items-center gap-3 px-4 py-6 mb-8">
           <Sparkles className="w-8 h-8 text-gold" />
@@ -73,7 +81,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto pb-20 md:pb-0">
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between px-4 py-4 bg-card border-b border-border">
           <Link to="/" className="flex items-center gap-2">
@@ -89,6 +97,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+        <div className="flex justify-around items-center h-16">
+          {mobileNavItems.map((item) => {
+            const isActive = location.pathname === item.path
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  'flex flex-col items-center gap-1 px-3 py-1 rounded-lg transition-colors min-w-[48px]',
+                  isActive
+                    ? 'text-gold'
+                    : 'text-muted-foreground'
+                )}
+              >
+                <item.icon className="w-5 h-5" />
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
     </div>
   )
 }

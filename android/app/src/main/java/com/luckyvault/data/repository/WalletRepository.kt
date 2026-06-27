@@ -11,8 +11,12 @@ class WalletRepository @Inject constructor(
     suspend fun getBalance(): Result<WalletDto> {
         return try {
             val response = api.getBalance()
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get balance"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get balance"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -21,8 +25,12 @@ class WalletRepository @Inject constructor(
     suspend fun getTransactions(page: Int = 1, limit: Int = 20): Result<TransactionsResponse> {
         return try {
             val response = api.getTransactions(page, limit)
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get transactions"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get transactions"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

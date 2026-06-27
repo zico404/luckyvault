@@ -11,8 +11,12 @@ class TicketRepository @Inject constructor(
     suspend fun purchaseTicket(drawId: String): Result<TicketDto> {
         return try {
             val response = api.purchaseTicket(PurchaseTicketRequest(drawId))
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to purchase ticket"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to purchase ticket"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -21,8 +25,12 @@ class TicketRepository @Inject constructor(
     suspend fun getMyTickets(page: Int = 1, limit: Int = 20): Result<TicketsResponse> {
         return try {
             val response = api.getMyTickets(page, limit)
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get tickets"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get tickets"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -31,8 +39,12 @@ class TicketRepository @Inject constructor(
     suspend fun getTicket(id: String): Result<TicketDto> {
         return try {
             val response = api.getTicket(id)
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get ticket"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get ticket"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

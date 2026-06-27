@@ -11,8 +11,12 @@ class NotificationRepository @Inject constructor(
     suspend fun getNotifications(page: Int = 1, limit: Int = 20): Result<NotificationsResponse> {
         return try {
             val response = api.getNotifications(page, limit)
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get notifications"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get notifications"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -21,8 +25,12 @@ class NotificationRepository @Inject constructor(
     suspend fun getUnreadCount(): Result<Int> {
         return try {
             val response = api.getUnreadCount()
-            if (response.isSuccessful) Result.success(response.body()!!.data.count)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get count"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it.count) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get count"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

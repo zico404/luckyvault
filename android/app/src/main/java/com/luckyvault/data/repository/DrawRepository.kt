@@ -11,8 +11,12 @@ class DrawRepository @Inject constructor(
     suspend fun getActiveDraws(): Result<List<DrawDto>> {
         return try {
             val response = api.getActiveDraws()
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get draws"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get draws"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -21,8 +25,12 @@ class DrawRepository @Inject constructor(
     suspend fun getCompletedDraws(page: Int = 1): Result<DrawsResponse> {
         return try {
             val response = api.getCompletedDraws(page)
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get draws"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get draws"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -31,8 +39,12 @@ class DrawRepository @Inject constructor(
     suspend fun getDraw(id: String): Result<DrawDto> {
         return try {
             val response = api.getDraw(id)
-            if (response.isSuccessful) Result.success(response.body()!!.data)
-            else Result.failure(Exception(response.body()?.message ?: "Failed to get draw"))
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(Exception(response.body()?.message ?: "Failed to get draw"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -29,8 +29,15 @@
 # Kotlin metadata
 -keep class kotlin.Metadata { *; }
 
-# Remove logging in release
+# Remove all logging in release
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);
+    public static *** i(...);
+    public static *** w(...);
+    public static *** e(...);
 }
+
+# Optimize R8
+-repackageclasses ''
+-allowaccessmodification
