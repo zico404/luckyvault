@@ -6,15 +6,15 @@
 /root/luckydraw/           # root
 ├── android/               # Android app (Kotlin, Jetpack Compose, Hilt)
 │   ├── app/src/main/java/com/luckyvault/
-│   │   ├── data/          # API, repositories, models
+│   │   ├── data/          # Supabase client, repositories, models
 │   │   ├── di/            # Hilt dependency injection
 │   │   ├── ui/            # Screens, navigation, components
 │   │   └── LuckyVaultApp.kt
 │   ├── app/build.gradle   # Version, signing, dependencies
 │   └── .github/workflows/ # CI/CD
-├── backend/               # NestJS API (TypeScript, Prisma, PostgreSQL)
+├── backend/               # NestJS API (TypeScript, Prisma, PostgreSQL via Supabase)
 │   ├── src/               # Modules: auth, draws, tickets, wallet, admin
-│   ├── prisma/            # Database schema
+│   ├── prisma/            # Database schema with RLS
 │   └── package.json
 ├── frontend/              # React + Vite + Tailwind (TypeScript)
 │   ├── src/
@@ -42,15 +42,92 @@ cd backend && npm install && npm run start:dev  # API on :3000
 
 ## Environment
 
-- **Backend**: Requires PostgreSQL, Redis, JWT_SECRET (see `backend/.env.example`)
-- **Frontend**: Requires `VITE_API_BASE_URL` (see `frontend/.env.example`)
-- **Android**: API URLs in `app/build.gradle` (debug: `10.0.2.2`, release: `api.luckyvault.app`)
+- **Backend**: Requires `DATABASE_URL` (Supabase PostgreSQL), `JWT_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- **Frontend**: Requires `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- **Android**: `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `BuildConfig` (debug: localhost, release: production)
 
 ## Important Notes
 
 - **Never build Android locally.** Use GitHub Actions only.
 - **Never commit secrets.** Use `.env` files (gitignored) and GitHub Secrets for CI.
 - **APK version** is in `android/app/build.gradle` (`versionName` / `versionCode`).
+- **Android NEVER connects directly to PostgreSQL.** Only Supabase URL + Anon Key.
+- **RLS is mandatory** on every table. No exceptions.
+
+---
+
+# Supabase Security Architecture (Mandatory)
+
+This project is a production application. Security is a top priority. Follow these rules without exception.
+
+## 1. Never connect the Android app directly to PostgreSQL
+
+The Android application MUST NEVER use:
+- Direct PostgreSQL connection string
+- Connection Pooler connection string
+- Database username
+- Database password
+- Service Role Key
+
+These credentials are server-side secrets and must never be embedded in the APK or any client-side code.
+
+## 2. Android App Configuration
+
+The Android application may only contain:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+
+Use the official Supabase SDK for all client communication. All database access from the Android app must go through Supabase client APIs. Never use raw PostgreSQL connections from the mobile application.
+
+## 3. Row Level Security
+
+Every database table must have RLS enabled. Create explicit policies for every table. Never rely on client-side checks. Users must only be able to read/modify their own data. Administrative data must never be accessible from the client.
+
+## 4. Backend Responsibilities
+
+These operations MUST execute only on trusted server-side code (Backend or Supabase Edge Functions):
+- Lucky Draw execution & winner selection
+- Wallet credit/debit & prize payout
+- Payment verification
+- Ticket generation & validation
+- QR verification
+- KYC approval & fraud detection
+- Admin operations & financial reporting
+- Scheduled draws & system maintenance
+
+These must never execute on the Android device.
+
+## 5. Service Role Key
+
+The Service Role Key must never be committed to Git, placed in the APK, stored in the repository, appear in logs, or be exposed to the client. Store it only in secure server environment variables or GitHub Secrets.
+
+## 6. Secrets Management
+
+All secrets must come from secure environment variables (GitHub Secrets, CI/CD Secrets, Server Environment Variables). Never hardcode API Keys, Database Passwords, JWT Secrets, Service Role Key, or Connection Strings.
+
+## 7. Authentication
+
+All users must authenticate using Supabase Auth. Every request must be tied to the authenticated user's JWT. Never trust user IDs supplied by the client. Always derive the authenticated user from the JWT.
+
+## 8. Wallet Security
+
+Wallet balances are server-controlled. The Android app must never calculate, credit, debit, or determine winnings. The client only displays data returned from secure backend endpoints.
+
+## 9. Lucky Draw Security
+
+The draw algorithm must execute only on the backend. Never expose draw logic, random seed, winning algorithm, or internal calculations. The Android app only displays published results.
+
+## 10. Payments
+
+All payment verification must occur on the backend. Never trust payment success reported by the client. Always verify transactions directly with the payment provider.
+
+## 11. GitHub Actions
+
+GitHub Actions must never expose secrets. Use GitHub Secrets for all sensitive values. Never print secret values in workflow logs.
+
+## 12. Logging
+
+Never log JWTs, Passwords, API Keys, Database Credentials, Connection Strings, or Service Role Keys. Sanitize all logs before output.
 
 ---
 

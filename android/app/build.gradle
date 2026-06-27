@@ -34,14 +34,21 @@ android {
         versionCode 1
         versionName "1.0.0"
 
-        multiDexEnabled false
-        buildConfigField "String", "BASE_URL", '"http://10.0.2.2:3000/api/v1/"'
-        buildConfigField "String", "PROD_BASE_URL", '"https://api.luckyvault.app/api/v1/"'
+        multiDexEnabled true
+
+        // Supabase configuration (safe to expose — anon key only)
+        buildConfigField "String", "SUPABASE_URL", '"https://kiogfskwxjgjbjqnwdyh.supabase.co"'
+        buildConfigField "String", "SUPABASE_ANON_KEY", '"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpb2dmc2t3eGpnamJqcW53ZHloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjUwMDAwMDAsImV4cCI6MjA0MDU3NjAwMH0.DummyKeyReplaceWithRealSupabaseAnonKey"'
+
+        // Backend API (for server-side operations)
+        buildConfigField "String", "API_BASE_URL", '"https://api.luckyvault.app/api/v1/"'
     }
 
     buildTypes {
         debug {
+            // Local development — backend runs on localhost
             buildConfigField "String", "API_BASE_URL", '"http://10.0.2.2:3000/api/v1/"'
+            buildConfigField "String", "SUPABASE_URL", '"https://kiogfskwxjgjbjqnwdyh.supabase.co"'
             buildConfigField "Boolean", "IS_DEBUG", "true"
         }
         release {
@@ -49,6 +56,7 @@ android {
                 signingConfig signingConfigs.release
             }
             buildConfigField "String", "API_BASE_URL", '"https://api.luckyvault.app/api/v1/"'
+            buildConfigField "String", "SUPABASE_URL", '"https://kiogfskwxjgjbjqnwdyh.supabase.co"'
             buildConfigField "Boolean", "IS_DEBUG", "false"
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -100,12 +108,17 @@ dependencies {
     kapt 'com.google.dagger:hilt-compiler:2.50'
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
 
-    // Retrofit
+    // Supabase Kotlin SDK
+    implementation 'io.github.jan-tennert.supabase:postgrest-kt:2.4.1'
+    implementation 'io.github.jan-tennert.supabase:gotrue-kt:2.4.1'
+    implementation 'io.github.jan-tennert.supabase:realtime-kt:2.4.1'
+
+    // Retrofit (for backend API calls)
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
 
-    // DataStore
+    // DataStore (for secure token storage)
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
     // Splash Screen
