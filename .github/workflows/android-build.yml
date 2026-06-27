@@ -17,6 +17,9 @@ on:
       - '.github/workflows/android-build.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: android-${{ github.ref }}
   cancel-in-progress: true
@@ -142,6 +145,17 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
+      - name: Copy Debug APK to apks/ with version
+        if: success()
+        run: |
+          VERSION=$(grep 'versionName' app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          APK_SRC="app/build/outputs/apk/debug/app-debug.apk"
+          if [ -f "$APK_SRC" ]; then
+            mkdir -p "${{ github.workspace }}/apks"
+            cp "$APK_SRC" "${{ github.workspace }}/apks/LuckyVault-v${VERSION}-debug.apk"
+            echo "Copied debug APK to apks/LuckyVault-v${VERSION}-debug.apk"
+          fi
+
   build-release:
     name: Build Release APK & AAB
     runs-on: ubuntu-latest
@@ -231,6 +245,40 @@ jobs:
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 90
           if-no-files-found: warn
+
+      - name: Copy APK to apks/ with version
+        if: success()
+        run: |
+          VERSION=$(grep 'versionName' app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          APK_SRC="app/build/outputs/apk/release/app-release-unsigned.apk"
+          if [ ! -f "$APK_SRC" ]; then
+            APK_SRC="app/build/outputs/apk/release/app-release.apk"
+          fi
+          if [ -f "$APK_SRC" ]; then
+            mkdir -p "${{ github.workspace }}/apks"
+            cp "$APK_SRC" "${{ github.workspace }}/apks/LuckyVault-v${VERSION}.apk"
+            echo "Copied APK to apks/LuckyVault-v${VERSION}.apk"
+          else
+            echo "No release APK found, skipping copy"
+          fi
+
+      - name: Commit APK to repo
+        if: success()
+        run: |
+          cd "${{ github.workspace }}"
+          VERSION=$(grep 'versionName' android/app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          APK_FILE="apks/LuckyVault-v${VERSION}.apk"
+          if [ -f "$APK_FILE" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "$APK_FILE"
+            if git diff --cached --quiet; then
+              echo "No changes to commit"
+            else
+              git commit -m "chore: update APK v${VERSION} [skip ci]"
+              git push
+            fi
+          fi
 
   summary:
     name: Build Summary
