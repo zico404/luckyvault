@@ -5,10 +5,4 @@
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">10.0.3.2</domain>
     </domain-config>
-    <domain-config>
-        <domain includeSubdomains="true">luckyvault.app</domain>
-        <pin-set expiration="2027-01-01">
-            <pin digest="SHA-256">placeholder-pin-hash</pin>
-        </pin-set>
-    </domain-config>
 </network-security-config>
