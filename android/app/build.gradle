@@ -41,7 +41,7 @@ android {
         buildConfigField "String", "SUPABASE_ANON_KEY", '"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpb2dmc2t3eGpnamJqcW53ZHloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjUwMDAwMDAsImV4cCI6MjA0MDU3NjAwMH0.DummyKeyReplaceWithRealSupabaseAnonKey"'
 
         // Backend API (for server-side operations)
-        buildConfigField "String", "API_BASE_URL", '"https://api.luckyvault.app/api/v1/"'
+        buildConfigField "String", "API_BASE_URL", '"https://lucky-vault-backend-production.up.railway.app/api/v1/"'
     }
 
     buildTypes {
@@ -55,7 +55,7 @@ android {
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
-            buildConfigField "String", "API_BASE_URL", '"https://api.luckyvault.app/api/v1/"'
+            buildConfigField "String", "API_BASE_URL", '"https://lucky-vault-backend-production.up.railway.app/api/v1/"'
             buildConfigField "String", "SUPABASE_URL", '"https://kiogfskwxjgjbjqnwdyh.supabase.co"'
             buildConfigField "Boolean", "IS_DEBUG", "false"
             minifyEnabled true
