@@ -38,7 +38,7 @@ fun MyTicketsScreen(
         } else if (uiState.tickets.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.ticket, null, tint = TextDisabled, modifier = Modifier.size(48.dp))
+                    Icon(Icons.Default.Receipt, null, tint = TextDisabled, modifier = Modifier.size(48.dp))
                     Spacer(Modifier.height(12.dp))
                     Text("No tickets yet", color = TextSecondary, style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(4.dp))

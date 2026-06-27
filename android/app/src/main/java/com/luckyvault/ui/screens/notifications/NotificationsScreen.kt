@@ -49,7 +49,7 @@ fun NotificationsScreen(
         } else if (uiState.notifications.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.notifications_off, null, tint = TextDisabled, modifier = Modifier.size(48.dp))
+                    Icon(Icons.Default.NotificationsOff, null, tint = TextDisabled, modifier = Modifier.size(48.dp))
                     Spacer(Modifier.height(12.dp))
                     Text("No notifications", color = TextSecondary, style = MaterialTheme.typography.titleMedium)
                 }
@@ -75,11 +75,11 @@ fun NotificationsScreen(
 @Composable
 private fun NotificationItem(notification: NotificationDto, onClick: () -> Unit) {
     val icon = when (notification.type) {
-        "WINNER" -> Icons.Default.emoji_events
-        "TICKET_PURCHASED" -> Icons.Default.confirmation_number
-        "DRAW_STARTED" -> Icons.Default.play_arrow
-        "DRAW_COMPLETED" -> Icons.Default.check_circle
-        else -> Icons.Default.notifications
+        "WINNER" -> Icons.Default.EmojiEvents
+        "TICKET_PURCHASED" -> Icons.Default.ConfirmationNumber
+        "DRAW_STARTED" -> Icons.Default.PlayArrow
+        "DRAW_COMPLETED" -> Icons.Default.CheckCircle
+        else -> Icons.Default.Notifications
     }
     val iconColor = when (notification.type) {
         "WINNER" -> Emerald

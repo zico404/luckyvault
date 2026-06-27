@@ -76,9 +76,9 @@ fun ProfileScreen(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
                     ProfileInfoRow(Icons.Default.MailOutline, "Email", uiState.user?.email ?: "Not set")
                     HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
-                    ProfileInfoRow(Icons.Default.account_balance_wallet, "Balance", "$${String.format("%.2f", uiState.wallet?.balance ?: 0.0)}")
+                    ProfileInfoRow(Icons.Default.AccountBalanceWallet, "Balance", "$${String.format("%.2f", uiState.wallet?.balance ?: 0.0)}")
                     HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), color = VaultSubtle)
-                    ProfileInfoRow(Icons.Default.badge, "Role", uiState.user?.role ?: "USER")
+                    ProfileInfoRow(Icons.Default.Badge, "Role", uiState.user?.role ?: "USER")
                 }
             }
 
@@ -94,7 +94,7 @@ fun ProfileScreen(
                     brush = androidx.compose.ui.graphics.SolidColor(Crimson.copy(alpha = 0.3f))
                 )
             ) {
-                Icon(Icons.Default.logout, null, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Logout, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("Sign out", fontWeight = FontWeight.Medium, fontSize = 14.sp)
             }

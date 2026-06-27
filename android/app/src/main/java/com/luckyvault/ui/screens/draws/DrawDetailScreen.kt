@@ -2,7 +2,6 @@ package com.luckyvault.ui.screens.draws
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -89,34 +88,6 @@ fun DrawDetailScreen(
                             DetailRow("Total tickets", "${draw.soldTickets}/${draw.maxTickets}")
                             Spacer(Modifier.height(12.dp))
                             DetailRow("Winner count", "${draw.winnerCount}")
-                        }
-                    }
-                }
-
-                // Winners
-                if (draw.status == "COMPLETED" && !draw.winners.isNullOrEmpty()) {
-                    item {
-                        Text("Winners", style = MaterialTheme.typography.titleLarge, color = TextPrimary)
-                    }
-                    itemsIndexed(draw.winners!!) { index, winner ->
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            color = VaultGraphite
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("#${index + 1}", fontWeight = FontWeight.Medium, color = Champagne, fontSize = 14.sp)
-                                Spacer(Modifier.width(12.dp))
-                                Column {
-                                    Text(winner.ticketCode, fontWeight = FontWeight.Medium, color = TextPrimary, fontSize = 14.sp)
-                                    if (winner.prizeAmount > 0) {
-                                        Text("$${String.format("%.2f", winner.prizeAmount)}", style = MaterialTheme.typography.bodySmall, color = Emerald)
-                                    }
-                                }
-                            }
                         }
                     }
                 }

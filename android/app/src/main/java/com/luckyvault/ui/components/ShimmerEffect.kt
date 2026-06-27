@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -14,8 +15,8 @@ import com.luckyvault.ui.theme.*
 
 @Composable
 fun ShimmerCard() {
-    val shimmerTransition = rememberInfiniteTransition(label = "shimmer")
-    val shimmerX by shimmerTransition.animateFloat(
+    val infiniteTransition = rememberInfiniteTransition(label = "shimmer")
+    val shimmerX by infiniteTransition.animateFloat(
         initialValue = -300f,
         targetValue = 300f,
         animationSpec = infiniteRepeatable(
@@ -31,7 +32,6 @@ fun ShimmerCard() {
         color = VaultGraphite
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            // Title shimmer
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
@@ -46,7 +46,6 @@ fun ShimmerCard() {
                     )
             )
             Spacer(Modifier.height(12.dp))
-            // Content shimmer
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.4f)
@@ -61,7 +60,6 @@ fun ShimmerCard() {
                     )
             )
             Spacer(Modifier.height(16.dp))
-            // Button shimmer
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

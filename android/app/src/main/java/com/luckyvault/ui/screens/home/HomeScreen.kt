@@ -84,19 +84,19 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         QuickAction(
-                            icon = Icons.Default.confirmation,
+                            icon = Icons.Default.ConfirmationNumber,
                             label = "Buy Ticket",
                             modifier = Modifier.weight(1f),
                             onClick = { uiState.activeDraws.firstOrNull()?.let { onBuyTicket(it.id) } }
                         )
                         QuickAction(
-                            icon = Icons.Default.account_balance_wallet,
+                            icon = Icons.Default.AccountBalanceWallet,
                             label = "Wallet",
                             modifier = Modifier.weight(1f),
                             onClick = onNavigateToWallet
                         )
                         QuickAction(
-                            icon = Icons.Default.ticket,
+                            icon = Icons.Default.Receipt,
                             label = "My Tickets",
                             modifier = Modifier.weight(1f),
                             onClick = onNavigateToTickets
@@ -311,7 +311,7 @@ fun EmptyState(title: String, subtitle: String) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                Icons.Default.inbox,
+                Icons.Default.Mail,
                 null,
                 tint = TextDisabled,
                 modifier = Modifier.size(40.dp)

@@ -109,7 +109,7 @@ fun WalletScreen(
                             modifier = Modifier.padding(40.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(Icons.Default.receipt_long, null, tint = TextDisabled, modifier = Modifier.size(40.dp))
+                            Icon(Icons.Default.ReceiptLong, null, tint = TextDisabled, modifier = Modifier.size(40.dp))
                             Spacer(Modifier.height(12.dp))
                             Text("No transactions yet", color = TextSecondary, style = MaterialTheme.typography.titleMedium)
                         }
@@ -153,11 +153,11 @@ fun WalletScreen(
 @Composable
 private fun TransactionRow(tx: com.luckyvault.data.remote.TransactionDto) {
     val icon = when (tx.type) {
-        "TOP_UP" -> Icons.Default.add_circle
-        "PURCHASE" -> Icons.Default.remove_circle
-        "WINNING" -> Icons.Default.emoji_events
-        "WITHDRAWAL" -> Icons.Default.arrow_upward
-        else -> Icons.Default.circle
+        "TOP_UP" -> Icons.Default.AddCircle
+        "PURCHASE" -> Icons.Default.RemoveCircle
+        "WINNING" -> Icons.Default.EmojiEvents
+        "WITHDRAWAL" -> Icons.Default.ArrowUpward
+        else -> Icons.Default.Circle
     }
     val color = when (tx.type) {
         "TOP_UP", "WINNING" -> Emerald

@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.graphicsLayer
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -50,27 +49,6 @@ fun AuthScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    // Subtle logo entrance animation
-    val infiniteTransition = rememberInfiniteTransition(label = "entrance")
-    val logoAlpha by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = EaseOutCubic),
-            repeatMode = RepeatMode.Once
-        ),
-        label = "logo_alpha"
-    )
-    val logoScale by infiniteTransition.animateFloat(
-        initialValue = 0.85f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = EaseOutCubic),
-            repeatMode = RepeatMode.Once
-        ),
-        label = "logo_scale"
-    )
-
     LaunchedEffect(uiState.isRegistered) {
         if (uiState.isRegistered) onNavigateToHome()
     }
@@ -87,20 +65,11 @@ fun AuthScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(0.dp))
-
-            // Top spacer for vertical centering feel
             Spacer(Modifier.weight(0.3f))
 
             // Logo mark
             Box(
-                modifier = Modifier
-                    .size(72.dp)
-                    .graphicsLayer {
-                        alpha = logoAlpha
-                        scaleX = logoScale
-                        scaleY = logoScale
-                    },
+                modifier = Modifier.size(72.dp),
                 contentAlignment = Alignment.Center
             ) {
                 VaultMark(size = 72)
@@ -108,7 +77,6 @@ fun AuthScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Brand name
             Text(
                 text = "LUCKY VAULT",
                 fontSize = 22.sp,
@@ -119,7 +87,6 @@ fun AuthScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // Tagline
             Text(
                 text = if (isLoginMode) "Welcome back" else "Create your account",
                 style = MaterialTheme.typography.bodyMedium,
@@ -129,37 +96,26 @@ fun AuthScreen(
 
             Spacer(Modifier.height(48.dp))
 
-            // ── Form Card ──
+            // Form Card
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                color = VaultGraphite.copy(alpha = 0.8f),
-                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Champagne.copy(alpha = 0.08f),
-                            Color.Transparent,
-                            Champagne.copy(alpha = 0.04f)
-                        )
-                    )
-                )
+                color = VaultGraphite
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Email
                     VaultTextField(
                         value = email,
                         onValueChange = { email = it },
                         label = "Email",
-                        icon = Icons.Default.MailOutline,
+                        icon = Icons.Default.Email,
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next,
                         onNext = { focusManager.moveFocus(FocusDirection.Down) }
                     )
 
-                    // Display name (signup only)
                     AnimatedVisibility(
                         visible = !isLoginMode,
                         enter = fadeIn() + expandVertically(),
@@ -169,18 +125,17 @@ fun AuthScreen(
                             value = displayName,
                             onValueChange = { displayName = it },
                             label = "Display name",
-                            icon = Icons.Default.PersonOutline,
+                            icon = Icons.Default.Person,
                             imeAction = ImeAction.Next,
                             onNext = { focusManager.moveFocus(FocusDirection.Down) }
                         )
                     }
 
-                    // Password
                     VaultTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = "Password",
-                        icon = Icons.Default.LockOutline,
+                        icon = Icons.Default.Lock,
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done,
                         isPassword = true,
@@ -208,7 +163,7 @@ fun AuthScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // ── Primary Button ──
+            // Primary Button
             Button(
                 onClick = {
                     if (isLoginMode) viewModel.login(email, password)
@@ -262,7 +217,6 @@ fun AuthScreen(
                 }
             )
 
-            // Bottom spacer
             Spacer(Modifier.weight(0.5f))
         }
     }
