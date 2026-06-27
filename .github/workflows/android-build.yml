@@ -233,7 +233,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lucky-vault-release-apk
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
           retention-days: 90
           if-no-files-found: warn
 
@@ -250,9 +252,9 @@ jobs:
         if: success()
         run: |
           VERSION=$(grep 'versionName' app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
-          APK_SRC="app/build/outputs/apk/release/app-release-unsigned.apk"
+          APK_SRC="app/build/outputs/apk/release/app-release.apk"
           if [ ! -f "$APK_SRC" ]; then
-            APK_SRC="app/build/outputs/apk/release/app-release.apk"
+            APK_SRC="app/build/outputs/apk/release/app-release-unsigned.apk"
           fi
           if [ -f "$APK_SRC" ]; then
             mkdir -p "${{ github.workspace }}/apks"
