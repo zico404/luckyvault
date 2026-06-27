@@ -29,6 +29,10 @@ fun DrawDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(drawId) {
+        viewModel.loadDraw(drawId)
+    }
+
     Scaffold(
         topBar = { LuckyVaultTopBar(title = "Draw details", onBack = onBack) },
         containerColor = VaultBlack
