@@ -7,9 +7,23 @@ import {
   Bell,
   User,
   LogOut,
-  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+function VaultLogo({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 108 108" className={className} xmlns="http://www.w3.org/2000/svg">
+      <circle cx="54" cy="54" r="42" fill="#C9A84C"/>
+      <circle cx="54" cy="54" r="38" fill="#0D1B0E"/>
+      <circle cx="54" cy="54" r="35" fill="none" stroke="#FFD700" strokeWidth="0.8" opacity="0.6"/>
+      <circle cx="54" cy="54" r="12" fill="#C9A84C"/>
+      <circle cx="54" cy="54" r="5" fill="#A08A3C"/>
+      <line x1="54" y1="43" x2="54" y2="65" stroke="#FFD700" strokeWidth="3.5" strokeLinecap="round"/>
+      <circle cx="54" cy="43" r="3" fill="#FFD700"/>
+      <circle cx="54" cy="65" r="3" fill="#FFD700"/>
+    </svg>
+  )
+}
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -39,14 +53,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen flex">
       {/* Sidebar - Desktop */}
-      <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border p-4">
+      <aside className="hidden md:flex flex-col w-64 glass-nav p-4 border-r border-white/5">
         <Link to="/" className="flex items-center gap-3 px-4 py-6 mb-8">
-          <Sparkles className="w-8 h-8 text-gold" />
+          <VaultLogo className="w-10 h-10" />
           <div>
             <span className="text-xl font-black text-gold">LUCKY</span>
-            <span className="text-xl font-black text-white"> VAULT</span>
+            <span className="text-xl font-black text-white/90"> VAULT</span>
           </div>
         </Link>
 
@@ -58,14 +72,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-2xl transition-all',
+                  'flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200',
                   isActive
-                    ? 'bg-primary/20 text-gold'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? 'glass bg-gold/10 text-gold border border-gold/20'
+                    : 'text-white/40 hover:text-white/70 hover:bg-white/5'
                 )}
               >
                 <item.icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium text-sm">{item.label}</span>
               </Link>
             )
           })}
@@ -73,22 +87,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-destructive transition-colors rounded-2xl"
+          className="flex items-center gap-3 px-4 py-3 text-white/30 hover:text-destructive transition-colors rounded-2xl"
         >
           <LogOut className="w-5 h-5" />
-          <span className="font-medium">Sign Out</span>
+          <span className="font-medium text-sm">Sign Out</span>
         </button>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto pb-20 md:pb-0">
         {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between px-4 py-4 bg-card border-b border-border">
+        <header className="md:hidden flex items-center justify-between px-4 py-4 glass-nav border-b border-white/5">
           <Link to="/" className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-gold" />
+            <VaultLogo className="w-8 h-8" />
             <span className="text-lg font-black">
               <span className="text-gold">LUCKY</span>{' '}
-              <span className="text-white">VAULT</span>
+              <span className="text-white/90">VAULT</span>
             </span>
           </Link>
         </header>
@@ -99,8 +113,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
-        <div className="flex justify-around items-center h-16">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 glass-nav border-t border-white/5 z-50">
+        <div className="flex justify-around items-center h-16 px-2">
           {mobileNavItems.map((item) => {
             const isActive = location.pathname === item.path
             return (
@@ -108,10 +122,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  'flex flex-col items-center gap-1 px-3 py-1 rounded-lg transition-colors min-w-[48px]',
+                  'flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all min-w-[52px]',
                   isActive
                     ? 'text-gold'
-                    : 'text-muted-foreground'
+                    : 'text-white/30 hover:text-white/50'
                 )}
               >
                 <item.icon className="w-5 h-5" />

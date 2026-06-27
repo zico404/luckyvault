@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { api } from '@/lib/api'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { Draw } from '@/types'
-import { Ticket, ArrowRight, Search } from 'lucide-react'
+import { Ticket, Search } from 'lucide-react'
 
 export function DrawsPage() {
   const navigate = useNavigate()
@@ -37,78 +37,78 @@ export function DrawsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Draws</h1>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search draws..."
-            className="pl-9 pr-4 py-2 bg-card border border-border rounded-2xl text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary"
+            className="pl-9 pr-4 py-2 glass-input text-sm text-white placeholder:text-white/20 focus:outline-none w-48"
           />
         </div>
       </div>
 
-      <div className="flex gap-1 p-1 bg-card rounded-2xl border border-border w-fit">
+      <div className="flex gap-1 p-1 glass-card w-fit">
         <button
           onClick={() => setTab('active')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-            tab === 'active' ? 'bg-gold text-surface' : 'text-muted-foreground hover:text-white'
+          className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+            tab === 'active' ? 'btn-gold' : 'text-white/40 hover:text-white/70'
           }`}
         >
           Active
         </button>
         <button
           onClick={() => setTab('completed')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-            tab === 'completed' ? 'bg-gold text-surface' : 'text-muted-foreground hover:text-white'
+          className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+            tab === 'completed' ? 'btn-gold' : 'text-white/40 hover:text-white/70'
           }`}
         >
           Completed
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filtered.length === 0 ? (
-          <div className="bg-card rounded-2xl p-12 text-center border border-border">
-            <Ticket className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-muted-foreground">No draws found</p>
+          <div className="glass-card p-12 text-center">
+            <Ticket className="w-10 h-10 text-white/10 mx-auto mb-3" />
+            <p className="text-white/30 text-sm">No draws found</p>
           </div>
         ) : (
           filtered.map((draw) => (
             <Link
               key={draw.id}
               to={`/draws/${draw.id}`}
-              className="block bg-card rounded-2xl p-6 border border-border hover:border-primary/30 transition-all group"
+              className="block glass-card p-5 hover:border-gold/20 transition-all duration-200 group"
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-white group-hover:text-gold transition-colors">
+                <h3 className="text-base font-semibold text-white group-hover:text-gold transition-colors">
                   {draw.title}
                 </h3>
-                <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                  draw.status === 'OPEN' ? 'bg-green-500/15 text-green-400' :
-                  draw.status === 'COMPLETED' ? 'bg-primary/15 text-primary-400' :
-                  'bg-gold/15 text-gold'
+                <span className={`px-2.5 py-1 text-[10px] font-medium rounded-full border ${
+                  draw.status === 'OPEN' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                  draw.status === 'COMPLETED' ? 'bg-primary/10 text-primary-400 border-primary/20' :
+                  'bg-gold/10 text-gold border-gold/20'
                 }`}>
                   {draw.status}
                 </span>
               </div>
 
-              <div className="grid grid-cols-4 gap-4 text-center">
+              <div className="grid grid-cols-4 gap-3 text-center">
                 <div>
-                  <p className="text-lg font-bold text-gold">{formatCurrency(draw.prizePool)}</p>
-                  <p className="text-xs text-muted-foreground">Prize Pool</p>
+                  <p className="text-sm font-bold text-gold">{formatCurrency(draw.prizePool)}</p>
+                  <p className="text-[10px] text-white/30">Prize Pool</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-white">{formatCurrency(draw.ticketPrice)}</p>
-                  <p className="text-xs text-muted-foreground">Price</p>
+                  <p className="text-sm font-bold text-white">{formatCurrency(draw.ticketPrice)}</p>
+                  <p className="text-[10px] text-white/30">Price</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-white">{draw.soldTickets}/{draw.maxTickets}</p>
-                  <p className="text-xs text-muted-foreground">Sold</p>
+                  <p className="text-sm font-bold text-white">{draw.soldTickets}/{draw.maxTickets}</p>
+                  <p className="text-[10px] text-white/30">Sold</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-white">{formatDate(draw.scheduledAt)}</p>
-                  <p className="text-xs text-muted-foreground">Date</p>
+                  <p className="text-sm font-bold text-white">{formatDate(draw.scheduledAt)}</p>
+                  <p className="text-[10px] text-white/30">Date</p>
                 </div>
               </div>
             </Link>

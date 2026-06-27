@@ -38,8 +38,8 @@ export function DrawDetailPage() {
   if (!draw) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Draw not found</p>
-        <button onClick={() => navigate('/draws')} className="mt-4 text-gold hover:underline">
+        <p className="text-white/40">Draw not found</p>
+        <button onClick={() => navigate('/draws')} className="mt-4 text-gold hover:underline text-sm">
           Back to Draws
         </button>
       </div>
@@ -47,80 +47,80 @@ export function DrawDetailPage() {
   }
 
   const rankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="w-8 h-8 text-gold" />
-    if (rank === 2) return <Medal className="w-8 h-8 text-gray-400" />
-    if (rank === 3) return <Award className="w-8 h-8 text-amber-600" />
-    return <Award className="w-8 h-8 text-muted-foreground" />
+    if (rank === 1) return <Trophy className="w-6 h-6 text-gold" />
+    if (rank === 2) return <Medal className="w-6 h-6 text-gray-400" />
+    if (rank === 3) return <Award className="w-6 h-6 text-amber-600" />
+    return <Award className="w-6 h-6 text-white/30" />
   }
 
   return (
     <div className="space-y-6 animate-fade-in max-w-2xl mx-auto">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-muted-foreground hover:text-white transition-colors"
+        className="flex items-center gap-2 text-white/30 hover:text-white/70 transition-colors text-sm"
       >
-        <ArrowLeft className="w-5 h-5" />
+        <ArrowLeft className="w-4 h-4" />
         Back
       </button>
 
-      <div className="bg-card rounded-3xl p-8 border border-border text-center"
-        style={{
-          background: 'linear-gradient(180deg, hsl(120 54% 24% / 0.2) 0%, hsl(var(--card)) 100%)',
-        }}
-      >
-        <h1 className="text-3xl font-bold text-white mb-2">{draw.title}</h1>
-        {draw.description && (
-          <p className="text-muted-foreground mb-4">{draw.description}</p>
-        )}
-        <p className="text-sm text-muted-foreground mb-2">PRIZE POOL</p>
-        <p className="text-5xl font-black text-gold">{formatCurrency(draw.prizePool)}</p>
+      <div className="glass-card p-8 text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20"
+          style={{ background: 'linear-gradient(180deg, hsl(120 54% 24% / 0.4) 0%, transparent 60%)' }} />
+        <div className="relative z-10">
+          <h1 className="text-2xl font-bold text-white mb-2">{draw.title}</h1>
+          {draw.description && (
+            <p className="text-white/40 mb-4 text-sm">{draw.description}</p>
+          )}
+          <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">Prize Pool</p>
+          <p className="text-4xl font-black text-gold gold-glow">{formatCurrency(draw.prizePool)}</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'Price', value: formatCurrency(draw.ticketPrice) },
           { label: 'Winners', value: draw.winnerCount.toString() },
           { label: 'Status', value: draw.status },
         ].map((stat) => (
-          <div key={stat.label} className="bg-card rounded-2xl p-4 text-center border border-border">
-            <p className="text-lg font-bold text-white">{stat.value}</p>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
+          <div key={stat.label} className="glass-card p-3 text-center">
+            <p className="text-sm font-bold text-white">{stat.value}</p>
+            <p className="text-[10px] text-white/30 mt-0.5">{stat.label}</p>
           </div>
         ))}
         {[
           { label: 'Sold', value: draw.soldTickets.toString() },
           { label: 'Max', value: draw.maxTickets.toString() },
-          { label: 'Remaining', value: (draw.maxTickets - draw.soldTickets).toString() },
+          { label: 'Left', value: (draw.maxTickets - draw.soldTickets).toString() },
         ].map((stat) => (
-          <div key={stat.label} className="bg-card rounded-2xl p-4 text-center border border-border">
-            <p className="text-lg font-bold text-white">{stat.value}</p>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
+          <div key={stat.label} className="glass-card p-3 text-center">
+            <p className="text-sm font-bold text-white">{stat.value}</p>
+            <p className="text-[10px] text-white/30 mt-0.5">{stat.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-card rounded-2xl p-4 border border-border flex items-center gap-3">
-        <Clock className="w-5 h-5 text-gold" />
+      <div className="glass-card p-4 flex items-center gap-3">
+        <Clock className="w-4 h-4 text-gold" />
         <div>
-          <p className="text-xs text-muted-foreground">Draw Time</p>
-          <p className="text-white font-medium">{formatDateTime(draw.scheduledAt)}</p>
+          <p className="text-[10px] text-white/30">Draw Time</p>
+          <p className="text-white/80 text-sm font-medium">{formatDateTime(draw.scheduledAt)}</p>
         </div>
       </div>
 
       {draw.status === 'COMPLETED' && draw.winners.length > 0 && (
         <div>
-          <h3 className="text-xl font-bold text-white mb-4">Winners</h3>
-          <div className="space-y-3">
+          <h3 className="text-lg font-bold text-white mb-3">Winners</h3>
+          <div className="space-y-2">
             {draw.winners.map((winner) => (
-              <div key={winner.ticketId} className="bg-card rounded-2xl p-4 border border-border flex items-center justify-between">
+              <div key={winner.ticketId} className="glass-card p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {rankIcon(winner.rank)}
                   <div>
-                    <p className="text-white font-semibold">#{winner.rank} Winner</p>
-                    <p className="text-xs text-muted-foreground">Ticket: {winner.ticketId.slice(0, 8)}...</p>
+                    <p className="text-white/80 font-semibold text-sm">#{winner.rank} Winner</p>
+                    <p className="text-[10px] text-white/30">Ticket: {winner.ticketId.slice(0, 8)}...</p>
                   </div>
                 </div>
-                <p className="text-lg font-bold text-green-400">+{formatCurrency(winner.prize)}</p>
+                <p className="text-sm font-bold text-green-400">+{formatCurrency(winner.prize)}</p>
               </div>
             ))}
           </div>
@@ -130,9 +130,9 @@ export function DrawDetailPage() {
       {draw.status === 'OPEN' && draw.soldTickets < draw.maxTickets && (
         <button
           onClick={() => navigate(`/draws/${draw.id}/buy`)}
-          className="w-full py-4 bg-gold text-surface font-bold rounded-2xl hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 btn-gold flex items-center justify-center gap-2 text-sm"
         >
-          <Ticket className="w-5 h-5" />
+          <Ticket className="w-4 h-4" />
           Buy Ticket — {formatCurrency(draw.ticketPrice)}
         </button>
       )}
