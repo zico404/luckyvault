@@ -94,7 +94,6 @@ fun NotificationsScreen(
                     refreshing = false
                 }
             }
-            }
         }
     }
 }

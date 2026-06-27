@@ -86,7 +86,6 @@ fun MyTicketsScreen(
                     refreshing = false
                 }
             }
-            }
         }
     }
 
