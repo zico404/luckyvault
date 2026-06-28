@@ -261,6 +261,34 @@ class ApiClient {
   async rejectTopUp(id: string): Promise<ApiResponse<any>> {
     return this.request(`/admin/topups/${id}/reject`, { method: 'POST' })
   }
+
+  async getAdminDashboard(): Promise<ApiResponse<any>> {
+    return this.request<any>('/admin/dashboard')
+  }
+
+  async getAdminUsers(page = 1, limit = 20): Promise<ApiResponse<any>> {
+    return this.request<any>(`/admin/users?page=${page}&limit=${limit}`)
+  }
+
+  async getAdminDraws(page = 1, limit = 20): Promise<ApiResponse<any>> {
+    return this.request<any>(`/admin/draws?page=${page}&limit=${limit}`)
+  }
+
+  async createDraw(data: { title: string; description?: string; ticketPrice: number; maxTickets: number; winnerCount: number; scheduledAt: string }): Promise<ApiResponse<any>> {
+    return this.request('/admin/draws', { method: 'POST', body: JSON.stringify(data) })
+  }
+
+  async executeDraw(id: string): Promise<ApiResponse<any>> {
+    return this.request(`/admin/draws/${id}/execute`, { method: 'POST' })
+  }
+
+  async openDraw(id: string): Promise<ApiResponse<any>> {
+    return this.request(`/admin/draws/${id}/open`, { method: 'PATCH' })
+  }
+
+  async getAuditLogs(page = 1, limit = 50): Promise<ApiResponse<any>> {
+    return this.request<any>(`/admin/audit-logs?page=${page}&limit=${limit}`)
+  }
 }
 
 export const api = new ApiClient()
