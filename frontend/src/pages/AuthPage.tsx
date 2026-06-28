@@ -31,14 +31,22 @@ export function AuthPage() {
     e.preventDefault()
     setLoading(true)
     try {
-      const result = isLogin
-        ? await login(email, password)
-        : await register(email, password, displayName || undefined)
-      if (result.success) {
-        toast(isLogin ? 'Welcome back!' : 'Account created successfully')
-        navigate('/')
+      if (isLogin) {
+        const result = await login(email, password)
+        if (result.success) {
+          toast('Welcome back!')
+          navigate(result.user?.role === 'ADMIN' ? '/admin' : '/')
+        } else {
+          toast(result.error || 'Authentication failed. Please check your credentials.', 'error')
+        }
       } else {
-        toast(result.error || 'Authentication failed. Please check your credentials.', 'error')
+        const result = await register(email, password, displayName || undefined)
+        if (result.success) {
+          toast('Account created successfully')
+          navigate('/')
+        } else {
+          toast(result.error || 'Authentication failed. Please check your credentials.', 'error')
+        }
       }
     } catch (err: any) {
       toast(err.message || 'An error occurred. Please try again.', 'error')

@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>
   register: (email: string, password: string, displayName?: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
 }
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await api.login(email, password)
       setUser(res.data.user)
-      return { success: true }
+      return { success: true, user: res.data.user }
     } catch (err: any) {
       return { success: false, error: err.message || 'Login failed. Please try again.' }
     }
