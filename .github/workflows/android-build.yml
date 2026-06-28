@@ -107,6 +107,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Auto-increment version
+        run: |
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"1.0.0.${{ github.run_number }}\"/" app/build.gradle
+          echo "versionName=$(grep 'versionName' app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')"
+          echo "versionCode=$(grep 'versionCode' app/build.gradle | head -1 | awk '{print $2}')"
+
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
@@ -167,6 +174,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Auto-increment version
+        run: |
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"1.0.0.${{ github.run_number }}\"/" app/build.gradle
 
       - name: Download debug APK artifact
         uses: actions/download-artifact@v4
