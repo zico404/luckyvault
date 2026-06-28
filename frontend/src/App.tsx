@@ -24,7 +24,7 @@ function PageLoader() {
   )
 }
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children, noLayout }: { children: React.ReactNode; noLayout?: boolean }) {
   const { isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
@@ -35,6 +35,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/auth" replace />
   }
 
+  if (noLayout) return <>{children}</>
   return <Layout>{children}</Layout>
 }
 
@@ -63,7 +64,7 @@ export default function App() {
           <Route path="/wallet/topup" element={<ProtectedRoute><TopUpPage /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute noLayout><AdminPage /></ProtectedRoute>} />
           <Route path="*" element={
             <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--vault-black)' }}>
               <div className="text-center space-y-4 animate-fade-in">
