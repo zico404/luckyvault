@@ -6,6 +6,7 @@ import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import { VaultMark } from '@/components/VaultLogo'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://lucky-vault-backend-production.up.railway.app'
+const APK_DIRECT_URL = 'https://raw.githubusercontent.com/zico404/luckyvault/main/apks/LuckyVault-debug.apk'
 
 export function AuthPage() {
   const navigate = useNavigate()
@@ -168,7 +169,7 @@ export function AuthPage() {
 
           {/* Download APK */}
           <a
-            href={`${import.meta.env.VITE_API_URL || 'https://lucky-vault-backend-production.up.railway.app'}/api/v1/download/apk`}
+            href={APK_DIRECT_URL}
             download="LuckyVault.apk"
             className="flex items-center justify-center gap-3 w-full h-12 rounded-xl transition-all duration-200 hover:scale-[1.01]"
             style={{
